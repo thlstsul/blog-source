@@ -7,7 +7,7 @@ categories: [git, hexo]
 ```
 deploy:
   type: github
-  repository: git@github.com:zzm5460zzm/zzm5460zzm.github.io.git
+  repository: git@github.com:zzm5460zzm/zzm5460zzm.github.io.git #使用git协议形式的url
   branch: master
 ```
 其实，只要正确的配置了ssh key和git config user，每次使用git远程操作都会自动进行验证登录，网上一大堆git免登录的文章却扯到了环境变量、内存储存密码……，还有一个居然用python来实现，都是没有必要的。
