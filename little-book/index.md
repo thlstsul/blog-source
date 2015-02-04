@@ -2,7 +2,7 @@ title: "The Little MongoDB"
 date: 2013-12-22 10:38
 ---
 
-{% img http://i.imgbox.com/MgbYbqmJ.png 890 The Little MongoDB Book, By Karl Seguin%}
+{% img http://i.imgbox.com/MgbYbqmJ 890 The Little MongoDB Book, By Karl Seguin%}
 
 
 ## 关于本书 ##
