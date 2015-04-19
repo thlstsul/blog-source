@@ -1,0 +1,3070 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="styleguide-zhCN.xsl"?>
+<GUIDE title="Google Common Lisp 风格指南">
+<div align="center">
+  <p>
+    <a HREF="http://juanitofatas.github.io/Google-Common-Lisp-Style-Guide/GoogleCLSG.xml"
+      TARGET="_blank">
+    Google Common Lisp Style Guide Rev. 1.23</a> in Chinese.
+    License:
+    <a HREF="http://creativecommons.org/licenses/by/3.0/" TARGET="_blank">CC-By 3.0</a>.
+  </p>
+</div>
+
+<p align="right">
+  修订版号 1.23
+</p>
+
+<address>
+Robert Brown
+</address>
+<address>
+  <a HREF="mailto:tunes@google.com">François-René Rideau</a>
+</address>
+
+<address>
+   纪念 Dan Weinreb
+</address>
+
+<p align="center">
+  <cite>模式意味着“我的语言不够用了。”</cite> ── Rich Hickey
+</p>
+
+<OVERVIEW>
+<CATEGORY title="重要注意事项">
+  <STYLEPOINT title="注意：显示在本指南里所隐藏的信息">
+     <SUMMARY>
+        这个风格指南包含了许多表面上看不到的细节。他们由三角图示标记，可以在左边看到。按下它。你应该看到“万岁”出现在下方。
+     </SUMMARY>
+     <BODY>
+       <p>
+        万岁！现在你知道如何将点展开来获得更多细节。在文件的最上方也有一个“全部展开”的按钮。
+       </p>
+     </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="背景">
+  <p>
+    Common Lisp 是一个强大的<abbr title="multi-paradigm programming language">多范式程序语言</abbr>。能力越强，责任越大。
+  </p>
+  <p>
+    本指南推荐了格式化及风格化的选择，目的在于使你的代码更容易被其他人理解。针对我们在 Google 开发的内部应用及免费软件函式库，在改动之前你得先遵循这些准则。但是要注意的是，每个项目有自己的一套规则及惯例，违反或覆写了这些通用的准则；比如速度导向的 QPX 低费率搜索引擎就与 QRes 订位系统有着大相迳庭的风格。
+  </p>
+  <p>
+    如果你在 Google 以外的地方编写 Common Lisp 代码，我们邀请你一同来思考这些准则。在不与你自身优先考量起冲突的前提上，你可能会发现某些准则是很有用的。我们欢迎你评论及提供建设性的反馈，讨论如何改善这篇指南，并提供其它成功案例的风格。
+  </p>
+  <p>
+    本指南不是一个 Common Lisp 教程。关于语言的基本信息，请查阅 <a HREF="http://www.gigamonkeys.com/book/">Practical Common Lisp</a> 。关于语言参考手册，请查阅 <a HREF="http://www.lispworks.com/documentation/HyperSpec/Front/index.htm">Common Lisp HyperSpec</a> 。
+    至于更详细的风格指南，姑且看看 Peter Norvig 与 Kent Pitman 写的 <a HREF="http://norvig.com/luv-slides.ps">风格指南</a> 。
+  </p>
+</CATEGORY>
+</OVERVIEW>
+<CATEGORY title="元準則">
+  <STYLEPOINT title="必须、应该、可能、别">
+    <SUMMARY>
+     每一个准则的重要程度，由下列来自 <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a> 的关键字及词组标示。
+    </SUMMARY>
+    <BODY>
+      <table>
+        <tr>
+          <th valign="top">必须 MUST</th>
+          <td>
+            <p>
+              MUST 或是 “REQUIRED”、“SHALL”，代表这是一个绝对得做的事儿。你必须徵询许可来违反一个 MUST。
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <th valign="top">绝对不要 MUST NOT</th>
+          <td>
+            <p>
+              MUST NOT，或是 “SHALL NOT”，代表这是绝对不能做的事儿，你必须徵询许可来违反一个 MUST NOT。
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <th valign="top">推荐 SHOULD</th>
+          <td>
+            <p>
+              SHOULD，或是形容词 “RECOMMENDED”，代表在特殊情况下也许有适当的理由可以违反准则的要求，但必须了解所有会影响到的事情，在选择另一个主题前审慎衡量。你必须徵询谅解来违反一个 SHOULD。
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <th valign="top">不推荐 SHOULD NOT</th>
+          <td>
+            <p>
+              SHOULD NOT，或是片语 “NOT RECOMMENDED”，代表在特殊情况下也许有适当的理由可以违反准则的要求，但必须了解所有会影响到的事情，在选择另一个主题前审慎衡量。你必须徵询谅解来违反一个 SHOULD NOT。
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <th valign="top">选择性 MAY</th>
+          <td>
+            <p>
+              MAY，或是形容词 “OPTIONAL”，代表某件事做不做完全取决于你。
+            </p>
+          </td>
+        </tr>
+      </table>
+      <p>
+        与 RFC 不同，我们在使用上列关键字时，不会将他们都转成大写。
+      </p>
+      <small>（译注：中文无法使用这些关键字，我尽力斟酌了行文中的口气，来达到效果。）</small>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="许可与谅解">
+    <SUMMARY>
+      有时候违反某些准则是有用甚至是必要的。在这些情况里，你必须向适当的人徵询许可或取得谅解。
+    </SUMMARY>
+    <BODY>
+      <p>
+        许可来自于项目的负责人。
+      </p>
+      <p>
+        在违反准则附近用注解来请求谅解，而你的代码审查者将授予谅解。原先的注解应由你签名，而审查者应在审查时，在注解里添加一个签名许可。
+      </p>
+
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="惯例">
+    <SUMMARY>
+      必须遵守这些约定。这不是选择性的。
+    </SUMMARY>
+    <BODY>
+      <p>
+        某些准则启发自良好的普遍编程原则。某些准则启发自 Common Lisp 的技术特性。某些准则启发自一个技术理由，但在理由消灭后，准则仍被保留了下来。某些像是注解及缩排的准则，完全是基于惯例，而不是有明显的技术价值。在任何情况下，必须遵循这些准则，以及其他常见但尚未被纳入本文件的准则。
+      </p>
+      <p>
+        必须要遵循惯例。惯例对于可读性来说非常重要。当惯例默认被遵循时，违反惯例是某件需要注意的事发生了，并需要留意的信号。当惯例被有组织地违反时，违反惯例会成为需要被忽略的恼人噪音。
+      </p>
+      <p>
+        常规惯例是一种教化。目的使你仿效社群的习俗，这样便可更有效率的与现有成员合作。分辨出哪些是启发于技术性、或仅仅是惯例的准则仍然很有用，这样你知道可以在何时违反惯例来获得好的成效，以及何时寻求准则帮助你不落入陷阱。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="古老代码">
+    <SUMMARY>
+      编程时顺手修补老代码。
+    </SUMMARY>
+    <BODY>
+      <p>
+        我们许多的代码都是在准则存在前所写的。平常编程遇到违反准则的代码时，修复它们。
+      </p>
+      <p>
+        不要在没有警告其他开发者或协调的情况下进行大量修补，也不要使合并较大的分支变得比以前困难。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="未来议题">
+    <SUMMARY>
+      当前版本的文件没有考虑到许多额外标准化的主题，这留到之后的版本。
+    </SUMMARY>
+    <BODY>
+      <ul>
+        <li>
+          文件及目录结构
+        </li>
+        <li>
+          包与模组化
+        </li>
+        <li>
+          线程与锁
+        </li>
+        <li>
+          如何添加可配置的组件
+        </li>
+        <li>
+          CLOS 风格：initforms, 槽以及访问器名称，等等。
+        </li>
+        <li>
+          每个类可有的最大槽数的建议。
+        </li>
+        <li>
+          更多良好代码的具体例子：
+          <ul>
+            <li>
+              异常
+            </li>
+            <li>
+              事务（含重试）
+            </li>
+            <li>
+              XML
+            </li>
+            <li>
+              类型
+            </li>
+            <li>
+              封装或抽象
+
+            </li>
+            <li>
+              类别及槽名
+            </li>
+            <li>
+              等等。
+            </li>
+          </ul>
+        </li>
+        <li>
+          何时（不要）使用条件式编译：
+          <ul>
+            <li>
+              改动产品时
+            </li>
+            <li>
+              条件式调试或终端输出等。
+            </li>
+            <li>
+              “暂时性”注解掉代码块
+            </li>
+            <li>
+              等等。
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="通用准则">
+  <STYLEPOINT title="原则">
+    <SUMMARY>
+      有某些基本原则，需要软件开发团队的每个开发者铭记在心。无论什么时候，觉得详细的准则不适当、感到疑惑或是自相矛盾时，回头看看这些原则来寻求指导：
+      <ul>
+        <li>
+          每一个开发者所写的代码必须让别的开发者容易阅读、理解及改动 ──── 即便最初的开发者已经不在了。（这是 “hit by a truck” 理论。）
+        </li>
+        <li>
+          大家的代码看起来要一致。理想上，不应该看到几行代码就认出，啊，这个风格是“Fred 写的代码”。
+        </li>
+        <li>
+          追求精准。
+        </li>
+        <li>
+          追求简洁。
+        </li>
+        <li>
+          KISS 原则（Keep It Simple, Stupid），简单就是美。
+        </li>
+        <li>
+          杀鸡焉用牛刀，用最适当的工具。
+        </li>
+        <li>
+          使用常识。
+        </li>
+        <li>
+          相关代码放在一起。将别人需要理解一部分代码所需的画面跳转减到最低。
+        </li>
+      </ul>
+    </SUMMARY>
+    <BODY>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="优先级">
+    <SUMMARY>
+      <p>
+        当抉择如何写出一段给定的代码时，依此优先序追求下列性质：
+      </p>
+      <ul>
+        <li>
+          客户的易用性。
+        </li>
+        <li>
+          可调试性或可测试性。
+        </li>
+        <li>
+          可读性或可理解性。
+        </li>
+        <li>
+          可扩充性或可修改性。
+        </li>
+        <li>
+          （运行期 Lisp 代码的）效率。
+        </li>
+      </ul>
+    </SUMMARY>
+    <BODY>
+      <p>
+        这些准则大部分都是直观的。
+      </p>
+      <p>
+        客户的易用性代表系统满足了客户的需求；如：需要处理客户的交易量，正常运作时的需求等等。
+      </p>
+      <p>
+        针对 Lisp 效率这一点，若是有两个同样复杂的选择，选运行较好的那个。（通常是构造比较少的那个，也就是从堆上配置了较少空间。）
+      </p>
+      <p>
+        给定两个选择，其中一个比另一个复杂，选择简单的那个，并分析出另一个有更好效能时，才重新审视当初的决定。
+      </p>
+      <p>
+        然而，避免过早优化。别为了给不常用到的代码提升速度而使复杂度上升。因为长期来说，鲜少运行的代码快不快不是那么重要。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="架构">
+    <SUMMARY>
+      要打造强韧且易维护的代码，这关系到如何将代码切分成组件，这些组件如何沟通，改版时这些改动如何传递。而最重要的是，程序员在改版时如何使这些组件互相沟通良好。
+    </SUMMARY>
+    <BODY>
+      <p>
+        如果你的工作会影响到其他的小组，或是可被小组之间重用，比如添加新组件会影响到其他小组（包括品管及运维），或是非本地作业的事情，在开始写代码前 ── 你必须至少写几段文字说明一下，并获得设计组或其他相关当事人的许可，不然在他们拒绝之后，准备好重头开始吧。
+      </p>
+      <p>
+        如果你不知道或不在乎这些议题，问问某些知道或在乎的人。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="使用函式库">
+    <SUMMARY>
+      通常最简单的办法是使用已存在的函式库。或还没存在的函式库。没有函式库的情况，我们鼓励你开发一个这样的函式库，但首先得未雨稠缪。
+    </SUMMARY>
+    <BODY>
+      <ul>
+        <li>
+          绝对不要贸然开始写一个新的函式库，除非你已查证没有可用的函式库存在，而新的函式库完成后可以解决或满足你的需求。这是一个违背<a HREF="http://zh.wikipedia.org/zh-cn/%E9%9D%9E%E6%88%91%E6%89%80%E5%89%B5">非我所创</a>症候群的规则，这个症候群在 Lisp 黑客圈里特别常见。
+        </li>
+        <li>
+          无论你采用是新的或古老的函式库，<em>必须</em>要获得许可，才能将第三方代码并入代码库。你必须在对的邮件组里讨论这个函式库的用途，并将你的代码交给此领域的专业人士审查，或是由（如果有的话） Lisp 函式库生态系统的人审查。并请准备好说明为什么这个特定的解决方案，比其他可用的函式库更好。
+        </li>
+        <li>
+          某些函式库的授权，与你正撰写的软件不兼容，则绝对不要将这个函式库认为是可用的。当心授权议题，或请教相关人士。
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="开源代码">
+    <SUMMARY>
+      <p>
+        如果你要写一个通用的函式库，或是改动一个存在的开源函式库，欢迎你将函式库与项目分开发布，并像是用其他的开源库一样导入你的函式库。
+      </p>
+    </SUMMARY>
+    <BODY>
+      <p>
+        用你的判断来分辨通用 vs 业务相关的代码，将通用的部份开源出来，而业务相关的部份保留为商业机密。
+      </p>
+      <p>
+        开源代码有许多好处，能促使第三方参与开发，使开发产品特色从用户角度出发，并使你诚实面对代码的品质。无论你写的是什么代码，你会需要维护他们的，并确保代码品质够好，能在产品上线时使用。开源正因为如此，不会有什么额外的负担。即便是（至少最初是如此）无法直接被第三方使用的代码。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="开发过程">
+    <SUMMARY>
+      开发过程超出了本文件的范围。然而开发者至少应记得下列几件小事：审查代码，撰写测试，去除警告，运行测试，避免大幅改动。
+    </SUMMARY>
+    <BODY>
+      <p>
+      </p>
+      <ul>
+        <li>
+          所有的代码改动必须经过审查。应该期待你的代码会被其他黑客审查，而你也会有机会去审查别人的代码。审查的部份标准，将会是代码需要遵守这份文件所载的编码标准。
+        </li>
+        <li>
+          你必须撰写测试，以及测试新撰写的代码，并记录你所修补的错误（bug）。每个 API 函数必须有单元测试，以及任何先前失败的例子。在前述事项做完之前，你的工作都不算完成。在评估工作任务时，必须算进撰写测试所花的时间。
+        </li>
+        <li>
+          代码编译后必须没有任何编译错误或是警告信息，等等。如果需要忽略编译器所抱怨的警告时，
+          将这些警告用 <code>UIOP:WITH-MUFFLED-COMPILER-CONDITIONS</code> 与 <code>UIOP:*UNINTERESTING-COMPILER-CONDITIONS*</code> 框架处理（部分是 <code>UIOP</code>，部分是 <code>ASDF 3</code>），将整个项目包起来，或是包覆单一的文件（使用 <code>ASDF</code> 的 <code>:around-compile</code> hook）。
+        </li>
+        <li>
+          所有的代码应该在一个适当的源代码管理系统检查，该系统可以在某种形式上，允许完整重新生成，某个已经布署（或可以布署）代码的版本、测试以及执行。
+        </li>
+        <li>
+          必须在运行测试前先测试单一的组件，只有在每个组件通过单元测试时，才可以提交代码。
+        </li>
+        <li>
+          应该将代码覆盖度纳入你的测试流程。如果测试不能涵盖所有新更新的代码，那么测试就是不足够的；无论有任何理由，一个测试无法覆盖的代码，需要清楚标明，并附上理由。
+        </li>
+        <li>
+          许多人在分支下开发。必须获得许可，再开始大幅度的改动。（比如大量的重新缩排）这样我们才可事先协调，并给予分支充裕的时间来回到主线上。
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="格式化">
+  <STYLEPOINT title="拼写与缩写">
+    <SUMMARY>
+      <p>
+        必须在注解里使用正确的拼写，而最重要要拼对的是函数的形参。
+      </p>
+      <p>
+        当数个正确拼写同时存在时（包括美式及英式英语），而开发者之间尚未有共识存在时，你应该选择较短的拼写。
+      </p>
+      <p>
+        必须只使用常见与领域相关的缩写，缩写保持一致。可以把受限作用域里的词法变量缩短，来避免符号名称过长。
+      </p>
+    </SUMMARY>
+    <BODY>
+      <p>
+        如果你不确定的话，查字典吧，或是 Google 下来检查拼写。或问问当地的专家。
+      </p>
+      <p>
+        下列是如何选择正确拼写的例子：
+      </p>
+      <ul>
+        <li>
+          使用 "complimentary" 表示免费饮料或大餐，
+          而不是 "complementary"。
+        </li>
+        <li>
+          使用 "existent" 以及 "nonexistent" 而不是 "existant"。
+          使用 "existence" 而不是 "existance"。
+        </li>
+        <li>
+          使用 "hierarchy" 而不是 "heirarchy"。
+        </li>
+        <li>
+          使用 "precede" 而不是 "preceed"。
+        </li>
+        <li>
+          使用 "weird" 而不是 "wierd"。
+        </li>
+      </ul>
+      <p>
+        下列是如何选择短的拼写的例子：
+      </p>
+      <ul>
+        <li>
+          使用 "canceled" 而不是 "cancelled"
+        </li>
+        <li>
+          使用 "queuing" 而不是 "queueing".
+        </li>
+        <li>
+          使用 "signaled" 而不是 "signalled";
+        </li>
+        <li>
+          使用 "traveled" 而不是 "travelled".
+        </li>
+        <li>
+          使用 "aluminum" 而不是 "aluminium"
+        </li>
+        <li>
+          使用 "oriented" 而不是 "orientated"
+        </li>
+        <li>
+          使用 "color" 而不是 "colour"
+        </li>
+        <li>
+          使用 "behavior" 而不是 "behaviour"
+        </li>
+      </ul>
+      <p>
+        位工业标准术语或是行话破例，包括了简单的拼写错误。
+        比如：
+      </p>
+      <ul>
+        <li>
+          在 HTTP 协议的上下文中，使用 "referer" 而不是 "referrer"
+        </li>
+      </ul>
+
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="行长">
+    <SUMMARY>
+      应该要格式化你的源代码，使单行不超过 100 个字符。
+    </SUMMARY>
+    <BODY>
+      <p>
+        有某些行长限制总比没有好。古老的文字终端机使用 80 栏，但现在允许 100 栏似乎比较好，因为好的风格鼓励你使用具有描述性的变量以及函数名称。
+      </p>
+
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="缩排">
+    <SUMMARY>
+      <p>
+        像配置好的 GNU Emacs 那样缩排你的代码。
+      </p>
+      <p>
+        审慎的缩排会使代码更容易理解。
+      </p>
+    </SUMMARY>
+    <BODY>
+      <p>
+        一般 GNU Emacs 在缩排 Common Lisp 代码这件工作上表现的非常出色。也可以教会 GNU Emacs 如何缩排新定义的形式，比如给特定领域语言用的特殊规则。每个项目可能含有某些定制缩排的文件；使用它们吧。
+      </p>
+
+      <p>
+        使用缩排让复杂的函数调用变得容易阅读。当调用一行放不下，或是函数接受太多参数时，考虑在参数之间插入新行，让每个参数都在独立的一行。不插入新行在某方面使得要知道函数接受多少参数，或参数从何开始又从何结束变得困难。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (do-something first-argument second-argument (lambda (x)
+            (frob x)) fourth-argument last-argument)
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (do-something first-argument
+                      second-argument
+                      #'(lambda (x) (frob x))
+                      fourth-argument
+                      last-argument)
+      </CODE_SNIPPET>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="文件表头">
+    <SUMMARY>
+      <p>
+        应该在每个源文件的最上方，注明维护者及其他重要信息。
+      </p>
+      <p>
+        不应该在源文件里附上版权与著作权的信息。
+      </p>
+    </SUMMARY>
+    <BODY>
+      <p>
+        每个源文件可以从简单描述下这个文件的内容开始。
+      </p>
+      <p>
+        在说明之后，每个文件应该用这个形式起步：
+        <code>(in-package :<em>package-name</em>)</code>
+      </p>
+      <p>
+        在 <code>in-package</code> 形式之后，
+        接着是任何与文件相关的声明，比如
+        <code>(declaim (optimize ...))</code>。
+        这些是 <code>ASDF</code> <code>:around-compile</code> hook 并没有涵盖到的声明。
+      </p>
+      <CODE_SNIPPET>
+        ;;;; Author: brown (Robert Brown)
+
+        ;;;; Variable length encoding for integers and floating point numbers.
+
+        (in-package #:varint)
+        (declaim #.*optimize-default*)
+      </CODE_SNIPPET>
+      <p>
+        不应该在文件顶端放著作权信息，著作权信息可以通过版本控制与 <code>OWNERS</code> 来取得。
+      </p>
+      <p>
+        不应该在每个源代码文件附上版权信息。单独发布的文件例外。
+      </p>
+      <p>
+        每个项目或函式库有个单一的文件，详细说明文件的授权。
+        没有授权或版权代表这个项目是<a HREF="http://en.wikipedia.org/wiki/Proprietary_software">专有代码</a>。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="垂直空间">
+    <SUMMARY>
+      垂直空间：顶层级别的形式，一个空行。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该在顶层级别的形式留一个空行，比如函数定义。在特殊情况下，空行可以省略，简单的、密切相关的、同种类的定义形式，比如一组相关的类型声明，或是常量定义。
+      </p>
+      <CODE_SNIPPET>
+        (defconstant +mix32+ #x12b9b0a1 "pi, an arbitrary number")
+        (defconstant +mix64+ #x2b992ddfa23249d6 "more digits of pi")
+
+        (defconstant +golden-ratio32+ #x9e3779b9 "the golden ratio")
+        (defconstant +golden-ratio64+ #xe08c1d668b756f82 "more digits of the golden ratio")
+
+        (defmacro incf32 (x y)
+          "Like INCF, but for integers modulo 2**32"
+          `(setf ,x (logand (+ ,x ,y) #xffffffff)))
+        (defmacro incf64 (x y)
+          "Like INCF, but for integers modulo 2**64"
+          `(setf ,x (logand (+ ,x ,y) #xffffffffffffffff)))
+      </CODE_SNIPPET>
+      <p>
+        空行可以把复杂的函数切分成多个部分。一般来说，你应该要把大函数切成几个小函数，而不是添加垂直空间，让它读起来比较好读。如果你不能够切成小函数，你应该要使用 <code>;;</code> 注解，说明每个函数的部分各是干嘛的。
+      </p>
+      <p>
+        应该要努力保留顶层形式（含注解），但文档字串最好保持简短。超过一页的顶层形式很少见，有这种情况的话，确定用途是正当的。这也可以应用到 <code>eval-when</code> 里的形式，而不是限制 <code>eval-when</code> 这个形式。另一方面，<code>defpackage</code> 可能更长，因为可能含有长长的符号列表。
+      </p>
+      <p>
+        每个顶层形式应该要少于 61 行，包含注解，但文档字串不算在内。这是用于在 <code>eval-when</code> 里的每个形式，而不是 <code>eval-when</code> 本身。另外 <code>defpackage</code> 可以超過 61 行，因为它可能有长长的列表清单。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="水平空间">
+    <SUMMARY>
+      水平空间：括弧之间不要有空格、tab。
+    </SUMMARY>
+    <BODY>
+      <p>
+        绝对不要在括号或符号的前面或后面加上额外的空白。
+      </p>
+      <p>
+        绝对不要把右括号单写在一行。一组连续的尾随括号必须出现在同一行。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 非常差劲
+        ( defun factorial ( limit )
+          ( let (( product 1 ))
+            ( loop for i from 1 upto limit
+                  do (setf product ( * product i ) ) )
+            product
+          )
+        )
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (defun factorial (limit)
+          (let ((product 1))
+            (loop for i from 1 upto limit
+                  do (setf product (* product i)))
+            product))
+      </CODE_SNIPPET>
+      <p>
+        形式之间应该只用一个空格。
+      </p>
+      <p>
+        你不应该在多行连续的中间，使用空格来垂直排列形式。一个例外是当代码不垂直对齐，就看不出你要强调的重要性时。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (let* ((low    1)
+               (high   2)
+               (sum    (+ (* low low) (* high high))))
+          ...)
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (let* ((low 1)
+               (high 2)
+               (sum (+ (* low low) (* high high))))
+          ...))
+      </CODE_SNIPPET>
+      <p>
+        你必须排列嵌套形式，如果他们超过一行的话。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (defun munge (a b c)
+        (* (+ a b)
+        c))
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (defun munge (a b c)
+          (* (+ a b)
+             c))
+      </CODE_SNIPPET>
+      <p>
+        惯例是一个绑定形式的主体，在第一行之后缩排两格。
+        任何在主体之前的绑定数据，通常缩排四格。
+        函数调用的参数与第一个参数对齐；
+        如果第一个参数自成一行，
+        则与函数名称对齐。
+      </p>
+      <CODE_SNIPPET>
+        (multiple-value-bind (a b c d)
+            (function-returning-four-values x y)
+          (declare (ignore c))
+          (something-using a)
+          (also-using b d))
+      </CODE_SNIPPET>
+      <p>
+        可有单独括号的例外献给数个定义之间的<code>eval-when</code> 形式；
+        在这个情况下，在闭括号附上一个注解 <code>; eval-when</code>。
+      </p>
+      <p>
+        必须设置好编辑器，使你在编辑文件时，避免插入 tab 字符。当编辑器不同意一个 Tab 是由几个空格代表时，Tab 会使你困惑。在 Emacs，输入 <code>(setq-default indent-tabs-mode nil)</code>。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="文档">
+  <STYLEPOINT title="钜细靡遗">
+    <SUMMARY>
+      所有可视函数都应该要使用文档字串，来解释如何使用你的代码。
+    </SUMMARY>
+    <BODY>
+      <p>
+        除非某段代码完全一目了然，不然就上一个文档字串（别名 docstring）。
+      </p>
+      <p>
+        文档字串生来就是给使用代码的程序员读的。他们可以从函数、类型、类别、变量以及宏取出，
+        并通过编程工具，如 IDE 来显示。或是通过在 REPL 下查询，如 <code>(describe 'foo)</code>；放在网上的文档或其他参考着作也可以在文档字串的基础上来创建。因此，文档字串是给你的 API 撰写文档的完美地点。应该描述如何使用代码（包括需要避开的陷阱），而不是代码是如何工作的（以及之后所需的工作），这两个是你该放在注解的东西。
+      </p>
+      <p>
+        当定义一个顶层及别的函数、类型、类别、变量以及宏时，提供一个文档字串。一般则是在程序语言允许加入文档的地方，添加文档字串。
+      </p>
+      <p>
+        关于函数，docstring 应该要描述函数的合约：
+        这个函数干什么，
+        这个函数的参数表示什么，
+        这个函数所返回的值，
+        这个函数可捕捉的状况。
+        应该在适当的抽象层级上来表达，解释意图，而不仅是解释语法。在文档字串里，将 Lisp 符号的名字转为大写，比如函数参数。打个比方，"The value of LENGTH should be an integer."
+      </p>
+      <CODE_SNIPPET>
+        (defun small-prime-number-p (n)
+          "Return T if N, an integer, is a prime number. Otherwise, return NIL."
+          (cond ((or (&lt; n 2))
+                 nil)
+                ((= n 2)
+                 t)
+                ((divisorp 2 n)
+                 nil)
+                (t
+                 (loop for i from 3 upto (sqrt n) by 2
+                       never (divisorp i n)))))
+      </CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (defgeneric table-clear (table)
+          (:documentation
+            "Like clrhash, empties the TABLE of all
+            associations, and returns the table itself."))
+      </CODE_SNIPPET>
+      <p>
+        一个长的 docstring 通常用一句话的总结开始是有用的，接着才是 docstring 的主要内容。
+      </p>
+      <p>
+        当一个类型的名称被使用时，符号可以用反引号及单引号包围，反引号在前，单引号在后。Emacs 会将类型高亮，而高亮会变成读取器的线索，
+        <kbd>M-.</kbd> 会跳转到符号的定义。
+      </p>
+      <CODE_SNIPPET>
+        (defun bag-tag-expected-itinerary (bag-tag)
+          "Return a list of `legacy-pnr-pax-segment' objects representing
+          the expected itinerary of the `bag-tag' object, BAG-TAG."
+          ...)
+      </CODE_SNIPPET>
+      <p>
+        当特化影响了方法的行为，超出通用函数的 docstring 所描述的内容时，应该给通用函数的每一个方法各自撰写文档。
+      </p>
+      <p>
+        当你修补了一个错误，思考看看修补后的代码是否正确，还是是错误的；如果不对的话，你必须添加一个注解，
+        从修补错误的观点来解释代码。如果可以的话，添加错误序号，也是推荐的。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="分号注解">
+    <SUMMARY>
+      你必须使用正确数量的分号来写注解。
+    </SUMMARY>
+    <BODY>
+      <p>
+        注解是给未来维护代码的人的说明。即便你是唯一能够看与接触到代码的人，即便你长生不老或是永远不离职，或是离职之后根本不管的人（并在这种万一的情况下使你的代码自行毁灭），你可能会发现给代码写注解是有帮助的。当然啦，在几个礼拜、月、年之后，回头看看代码时，你会发现当初写这个代码的人，完全与你不是同一个人，则你会感激当初自己有留下注解。
+      </p>
+      <p>
+        你必须给任何复杂的代码留注解，这样一来下个开发者才可以了解情况。（又来了，“hit by a truck” 理论。）
+      </p>
+      <p>
+        注解也可以作为指引阅读代码的人的一种方式，这样他们才知道这里有什么。
+      </p>
+      <ul>
+        <li>
+          文件表头及源文件里大段代码的重要注解，注解应该使用四个分号。
+        </li>
+        <li>
+          一个顶层级别的形式或是小组的顶层级别形式，注解应该使用三个分号。
+        </li>
+        <li>
+          在一个顶层级别的形式里，如果注解出现在行之间，注解应该使用两个分号。
+        </li>
+        <li>
+          如果是一个括号的备注且出现在行的最后，注解应该使用一个分号。你应该使用空格来分离注解与引用的代码，使得注解脱颖而出。你应该试着垂直排列相关的行尾注解。
+        </li>
+      </ul>
+      <CODE_SNIPPET>
+        ;;;; project-euler.lisp
+        ;;;; File-level comments or comments for large sections of code.
+
+        ;;; Problems are described in more detail here:  http://projecteuler.net/
+
+        ;;; Divisibility
+        ;;; Comments that describe a group of definitions.
+
+        (defun divisorp (d n)
+          (zerop (mod n d)))
+
+        (defun proper-divisors (n)
+          ...)
+
+        (defun divisors (n)
+          (cons n (proper-divisors n)))
+
+        ;;; Prime numbers
+
+        (defun small-prime-number-p (n)
+          (cond ((or (&lt; n 2))
+                 nil)
+                ((= n 2)   ; parenthetical remark here
+                 t)        ; continuation of the remark
+                ((divisorp 2 n)
+                 nil)  ; different remark
+                ;; Comment that applies to a section of code.
+                (t
+                 (loop for i from 3 upto (sqrt n) by 2
+                       never (divisorp i n)))))
+      </CODE_SNIPPET>
+      <p>
+        在分号与注解文字之间，应该留一个空格。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="标点与文法">
+    <SUMMARY>
+      应该使用正确的标点符号来撰写文档。
+    </SUMMARY>
+    <BODY>
+      <p>
+        当注解是一个完整的句子时，应该将第一个字大写，并用一个句号结束注解。普遍来说，你应该使用正确的标点符号。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="小心注意">
+    <SUMMARY>
+      对于需要特别注意的代码，必须遵循使用 TODO 注解的规范。
+      针对使用了晦涩形式的代码，必须要加上注解。
+    </SUMMARY>
+    <BODY>
+      <p>
+        对于需要特别留意的注解，像是未完成的代码、待办事项、问题、损坏及危险，
+        加上一个 TODO 注解指出问题的类型及本质，以及其他需要注意的事项。
+      </p>
+      <p>
+        TODO 注解的格式，由 TODO （全大写）开始，接着是括号，括号内是你的邮箱或是其他人，再来是一个冒号跟空格，以及额外需要完成或想要完成的工作说明。包含在此注解内的用户名，是理解这个缺陷的那个人。TODO 注解并不代表一定要修补问题。
+      </p>
+      <p>
+        当给注解签名时，应该使用用户名（针对公司内部代码），或是完整 email 地址（针对公司外部可见代码），而不只是名字的首字母缩写。
+      </p>
+      <CODE_SNIPPET>
+        ;;--- TODO(george@gmail.com): Refactor to provide a better API.
+      </CODE_SNIPPET>
+      <p>
+        在 TODO 注解里，具体指出时间或是软件版本：
+      </p>
+      <CODE_SNIPPET>
+        ;;--- TODO(brown): Remove this code after release 1.7 or before November, 2012.
+      </CODE_SNIPPET>
+      <p>
+        对于使用了晦涩形式来完成工作的代码，必须加上注解叙述晦涩形式的用途，
+        以及晦涩形式完成了什么工作。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="特定领域语言">
+    <SUMMARY>
+      你应该给 DSL 及任何在 DSL 里的简短程序写文档。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该设计出同行容易阅读及理解的特定领域语言。
+      </p>
+      <p>
+        必须正确地给你的 DSL 写文档。
+      </p>
+      <p>
+        有的时候，你的 DSL 设计的相当简洁。
+        在这个情况里，如果每个程序从上下文中不是很直观的话，
+        用文档说明每个程序干了什么是很重要的。
+      </p>
+      <p>
+        值得注意的是，当使用正则表达式时（比如使用 <code>CL-PPCRE</code> 包），永远记得要留一条注解（通常在前一行加两个分号的注解），（最起码）要解释正则表达式做了什么，或是目的为何。注解不需要解释语法的所有细节，但应该让别人不需要解析正则表达式，就能理解你代码的逻辑是什么。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="命名">
+  <STYLEPOINT title="符号准则">
+    <SUMMARY>
+      使用小写。
+      遵循<a href="#拼写与缩写">拼写与缩写一节</a>的惯例。
+      遵循标点符号的惯例。
+    </SUMMARY>
+    <BODY>
+      <p>
+        所有的符号使用小写。一致地使用小写，除了可读性更高之外，也让查找符号名变得更容易。
+      </p>
+      <p>
+        注意 Common Lisp 会自动转换大小写，而对一个符号调用 <code>symbol-name</code> 时，会返回大写。由于这个转换大小写的特色，当你试着要分辨符号的大小写时，最终只会让你陷入困惑。但使用逃脱字符也是可以强迫符号成为小写的，不过你不应该使用这个功能，除非你需要与第三方软件协同操作。
+      </p>
+      <p>
+        在符号的单词之间放连字符。如果你不能很简单的说出标识符的名字，那符号大概命名的很差劲。
+      </p>
+      <p>
+        连字符必须用 <code>"-"</code>，不要用 <code>"/"</code> 或是 <code>"."</code>。除非你有一个无懈可击的理由，以及你的提议取得了来自其他黑客的许可。
+      </p>
+      <p>
+        参考<a href="#拼写与缩写">拼写与缩写</a>一节，以了解使用缩写的准则。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (defvar *default-username* "Ann")
+        (defvar *max-widget-cnt* 200)
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (defvar *default-user-name* "Ann")
+        (defvar *maximum-widget-count* 200)
+      </CODE_SNIPPET>
+      <p>
+        Common Lisp 在符号内使用标点符号是有惯例的。不应该在这些惯例之外，在符号内使用标点符号。
+      </p>
+      <p>
+        除非变量的作用域非常小，不要使用过短的名字，像是：<code>i</code> 以及 <code>zq</code>。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="表明目的，而非内容">
+    <SUMMARY>
+      将变量用目的命名，而不是变量的内容。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该根据变量所意涵的概念命名，而不是根据概念在机器底层是怎么表示的来命名。
+      </p>
+      <p>
+        因此，你应该避免嵌入数据结构或结合类型名称，比如将 <code>list</code>, <code>array</code>，或是
+        <code>hash-table</code> 嵌入变量名，除非你正在写一个通用的演算法，适用于任何的列表、数组、哈希表，等等。在这个情况下，变量名有 <code>list</code> 或 <code>array</code>是完全没问题的。
+      </p>
+      <p>
+        当然啦，无论何时你有创造新种对象的目的时，应该使用 <code>DEFCLASS</code> 或 <code>DEFTYPE</code>，来引入新的抽象数据类型，操作这些对象的函数，可以通用地使用反映出抽象类型的名称。
+      </p>
+      <p>
+        举例来说，如果一个变量的值，总是一个 row（或是 <code>NIL</code>），叫它 <code> row </code> 或 <code>first-row</code> 是很好的，或者是其他相似的名字。<code>row</code> 被 <code>DEFTYPE</code>定义成 <code>STRING</code> 是没问题的。严格来说，因为你将细节抽象起来了，剩下的亮点是，它是一个 row。在这个上下文里，不应该将变量取名为 <code>STRING</code>，除非底层函数明确地操作 row 的内部结构，提供与 STRING 类似的抽象。
+      </p>
+      <p>
+        保持一致。如果变量在一个函数里命名成 <code>row</code>，且它的值被传给第二个函数，则将其称为 <code>row</code> 而不是 <code>value</code>。（这是一个实际情况）
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="全局变量与常量">
+    <SUMMARY>
+      根据惯例来命名全局变量。
+    </SUMMARY>
+    <BODY>
+      <p>
+        全局常量名应由加号开始，并以加号结束。
+      </p>
+      <p>
+        全局变量名应由星号开始，并以星号结束（在这个上下文里，星号又称为耳套「earmuffs」）。
+      </p>
+      <p>
+        在某些项目里，参数在普通情况下，通常不会被绑定或改动（但也许某些实验或例外情况会），应用一个钱号开始（但非钱号结束）。如果这样的惯例在你的项目里存在的话，应该一致地遵守。否则，应该避免这样子命名变量。
+      </p>
+      <p>
+        Common Lisp 没有全局词法变量，所以命名惯例是确保全局变量会被动态绑定，以及不会与局部变量名称重复。要捏造一个全局词法变量也是有可能的，只要有 <code>DEFINE-SYMBOL-MACRO</code> 以及用不同的方式命名全局变量。不应该使用这个技巧，除非你先发布一个函式库将它抽象起来。
+      </p>
+      <CODE_SNIPPET>
+        (defconstant +hash-results+ #xbd49d10d10cbee50)
+
+        (defvar *maximum-search-depth* 100)
+      </CODE_SNIPPET>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="判断式名称">
+    <SUMMARY>
+      判断式函数与变量的名字以 <code>"P"</code> 结尾。
+    </SUMMARY>
+    <BODY>
+      <p>
+        你应该将返回布尔值的函数与变量的
+        结尾以 <code>"P"</code> 或 <code>"-P"</code> 命名，
+        来表示他们是判断式。
+        一般来说，你应该使用，
+        函数名是一个单词时，使用 <code>"P"</code>；
+        超过一个单词时，使用 <code>"-P"</code>。
+      </p>
+      <p>
+        这个惯例的理由在
+        <a href="http://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node69.html">the CLtL2 chapter on predicates</a> 给出。
+      </p>
+      <p>
+        为了要统一，你应该遵循上面的惯例，
+        而不是下面其中一个替代方案。
+      </p>
+      <p>
+        一个替代规则是，在某些已存在的包，
+        总是使用 <code>"-P"</code>。
+
+        另一个替代规则是，在某些已存在的包，
+        总是使用 <code>"?"</code>。
+
+        当你开发一个包时，你必须要与其它的包保持一致。
+        当你开始一个新包时，在没有非常充分记录你的理由之前，
+        你应该不要使用这些替代规则，
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="忽略函式库前缀">
+    <SUMMARY>
+      符号名不应该纳入一个函式库或包的前缀。
+    </SUMMARY>
+    <BODY>
+      <p>
+        当在包里命名（内部或外部）符号时，
+        你不应该将包的名称作为前缀含在符号里。
+        这样命名符号，让访问这个包的人，
+        必须使用包前缀来修饰，这样是很尴尬的。
+        （一次是包的前缀、另一次是符号名的前缀）。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (in-package #:varint)
+        (defun varint-length64 () ... )
+
+        (in-package #:client-code)
+        (defconst +padding+ (varint:varint-length64 +end-token+))
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (in-package #:varint)
+        (defun length64 () ... )
+
+        (in-package #:client-code)
+        (defconst +padding+ (varint:length64 +end-token+))
+      </CODE_SNIPPET>
+      <p>
+        上述规则的一个例外会是给变量名加入前缀，
+        不然就会与使用当前这个包的人起冲突的情况。
+        举例来说，<code>ASDF</code> 导出一个变量叫做 <code>*ASDF-VERBOSE*</code>，
+        这个变量只受唠叨的 ASDF 控制，而不是整个 Lisp 程序。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="包">
+    <SUMMARY>
+      适当地使用包。
+    </SUMMARY>
+    <BODY>
+      <p>
+        Lisp 的包用来划分命名空间。
+        通常每个系统有独立的命名空间。
+        一个包有一组导出的符号，
+        目的就是给包外部的人用的，
+        允许其它的模组使用模组内的实用函数。
+      </p>
+      <p>
+        包的内部符号应该永远不可以被其它的包引用。
+        也就是说，你应该永远不需要使用两个冒号
+        <code>::</code> 来建构符号
+        （比如：<code>QUAKE::HIDDEN-FUNCTION</code>）。
+        如果需要使用两个冒号来实际上线的代码，
+        那么一定有什么出错了，并需要人来修补。
+      </p>
+      <p>
+        有一个例外是，
+        单元测试可使用被测包的内部符号。
+        当你重构时，小心那些被包的单元测试所使用的内部符号。
+      </p>
+      <p>
+        <code>::</code> 用来建构非常临时的窍门 (hack)，
+        或是在 REPL 使用也是很有用的。
+        但若是符号真是外部可见的包定义中的一部分，
+        导出它。
+      </p>
+      <p>
+        你可能发现某些内部符号所代表的概念，你通常会想要抽象起来，
+        藏在表面之下，但有时又需要让外部扩展的人使用。
+        针对前一个理由，你不想导出它们，
+        针对后一个理由，你需要导出他们。
+        解决办法是有两个不同的包，
+        一个给正常用户使用，另一个给实现本身及扩展者使用。
+      </p>
+      <p>
+        包有两种：
+      </p>
+      <ul>
+        <li>
+          一种是被纳入其它包的 <code>:use</code> 规格说明。
+          如果甲包使用乙包，则乙包的外部符号可以在甲包内被引用，
+          而无需使用包的前缀。
+          我们主要在底层模组使用这种包，来提供广用的实用函数。
+        </li>
+        <li>
+          一种是不打算被使用。
+          要引用乙包提供的一个实用函数时，
+          甲包的代码必须使用一个显式的包前缀，
+          比如 <code>乙:DO-THIS</code>。
+        </li>
+      </ul>
+      <p>
+        如果你添加了一个新的包，它应该总是第二种的，
+        除非你有一个特殊理由并获得许可。
+        包内的函数名会根据包的用途变化。
+        举例来说，如果你有一个叫做 <code>FIFO</code> 的抽象，
+        且是属于第一种类的包。
+        则你会有像是 <code>FIFO-ADD-TO</code> 以及 <code>FIFO-CLEAR-ALL</code>
+        这样名称的函数名。
+        如果你的包是第二种类的用途，
+        则会有像是 <code>FIFO:ADD-TO</code> 以及 <code>FIFO:CLEAR-ALL</code>
+        这样名称的函数名，因为调用者会
+        <code>FIFO:ADD-TO</code> and <code>FIFO:CLEAR-ALL</code> 这么用。
+        （<code>FIFO:FIFO-CLEAR-ALL</code> 既冗赘又丑陋。）
+      </p>
+      <p>
+        另一件关于包的好事是，
+        符号名不会与其它包的名称起冲突，
+        除非你的包"自己"起冲突。
+        所以你得小心 Lisp 实现自带的名称（因为你总是会用），
+        以及其它你所使用的包的名称。
+        但你可以自由取任何名字，即便是短的名字，
+        而不需要担心别人使用了同样的名称。
+        包使你与别人隔离开了。
+      </p>
+      <p>
+        你的包绝对不要遮蔽(重定义）属于 Common Lisp 语言部分的符号。
+        某些时候例外，但理由必须要非常充分，这种情况相当稀少：
+      </p>
+      <ul>
+        <li>
+          如果你显式地用一个更安全或更有特色的版本，
+          替换 Common Lisp 内置的符号。
+        </li>
+        <li>
+          如果你定义一个不打算给人用的包，
+          并有一个好的理由，支持你导出与 Common Lisp 抵触的符号，
+          如 <code>log:error</code> 以及 <code>log:warn</code> 等等。
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="语言使用准则">
+  <STYLEPOINT title="以函数式风格为主">
+    <SUMMARY>
+      不是必要的情况下，避免使用副作用。
+    </SUMMARY>
+    <BODY>
+      <p>
+        Lisp 的最佳用法是"以函数式风格为主"。
+      </p>
+      <p>
+        避免改动局部变量，重新绑定试试。
+      </p>
+      <p>
+        避免创建对象并给他们的槽赋值。
+        最好在初始化的时候将槽设置好。
+      </p>
+      <p>
+        让类别越坚固越好，也就是说，尽可能避免给槽用赋值函数。
+      </p>
+      <p>
+        以函数是风格为主使得撰写线程安全的并发代码变得非常简单。
+        也使得测试代码变容易了。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="递归">
+    <SUMMARY>
+      你应该偏好迭代胜于递归。
+    </SUMMARY>
+    <BODY>
+      <p>
+        Common Lisp 系统不要求每个实现实作不会泄漏栈内存的尾递归 ──
+        也称为正规尾调用 (PTC)、尾调用消除(TCE) 或尾调用优化 (TCO)。
+        这表示由尾调用所产生的无穷递归很快就把栈吃光光了，
+        阻碍了函数式编程。
+        最严格的实现（包括了 SBCL 与 CCL) 还是有实作正规尾调用，
+        但有如下限制：
+      </p>
+      <ul>
+        <li>
+          <code>(DECLARE (OPTIMIZE ...))</code> 的设置必须
+          <code>SPEED</code> 够高且
+          <code>DEBUG</code> 不能太高，
+          这里的够高与不能太高，每个编译器的数值都不同。
+          （举例来说，在 SBCL，
+          你应该避免 <code>(SPEED 0)</code> 以及 <code>(DEBUG 3)</code>
+          来实现正规尾调用。）
+        </li>
+        <li>
+          应该避免在调用时使用动态绑定（即使某些 Scheme 编译器能够
+          正确处理这样的动态绑定，根据 Scheme 的说法是叫做 parameters。）
+        </li>
+      </ul>
+      <p>
+        为了兼容所有的编译器及优化设置，以及避免调试时栈溢出发生，
+        你应该偏好迭代或是内置的映射函数，胜于依赖正规尾调用。
+      </p>
+      <p>
+        如果你真的得用正规尾调用的话，
+        你必须明显记录起来，并实验编译器的优化参数，
+        确保你使用了正确的优化设置。
+        想要有可移植到任何地方的代码，
+        你可以使用一个迭代地调用续延传递函数的循环 (<a HREF="http://en.wikipedia.org/wiki/Trampoline_(computing)#High_Level_Programming">trampolines</a>)。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="特殊变量">
+    <SUMMARY>
+      节制使用特殊变量。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该节制使用 Lisp 的"特殊" （动态绑定）变量作为函数的隐式参数，
+        并且只在不会吓到读代码的人的前提下使用，
+        以及有显着好处的情况下使用。
+      </p>
+      <p>
+        每个特殊变量会建立状态。
+        当试着要了解代码在干嘛或代码怎么实现的时候，
+        开发者需要绞尽脑汁地追踪所有相关变量的状态；
+        需要撰写测试并运行所有相关的可能性；
+        要将某个行为隔离时，必须考虑到所有相关的局部变量，
+        包括那些没有直接使用模组的局部变量。
+        他们可能隐藏了珍贵的信息，可以通过印出回溯来得知。
+        特殊变量不仅给每个新创建的变量带来负担，
+        特殊变量数目上升时，也使变量之间的互动变得更复杂。
+        收支必须平衡啊。
+      </p>
+      <p>
+        需要注意的是，虽然 Lisp 的特殊变量，
+        与 BASIC 或 C 概念上的全局变量不同。
+        特殊变量可以动态地绑定到一个局部值，
+        在每个用户需要互相往来时，
+        比一般仅存放全局数值的内存空间（全局变量）来得强大。
+      </p>
+      <p>
+        特殊变量好的使用时机是，
+        当 “the current” 可以很自然的用作前缀时，
+        像是 “the current database connection” 或是
+        “the current business data source” 。
+        在其它代码仍有用到特殊变量的情况下，特殊变量是单例，
+        并通常作为显式参数传递，
+        但不对充满疑惑的源代码提高可读性或是可维护性。
+      </p>
+      <p>
+        特殊变量可以使撰写出能够重构的代码更简单。
+        如果你有一个处理请求链，有着数个操作在"当前"请求的层级，
+        将请求对象显式地传给每个函数，
+        需要在链中的每个函数都有一个请求参数。
+        将代码重构成新的函数，通常需要这些函数也有这个参数，
+        也会把用模版写成的代码弄的杂乱不堪。
+      </p>
+      <p>
+        应该将特殊变量想成是每个线程只有一个的变量。
+        默认情况下，你应该让一个特殊变量不具有任何的顶层绑定，
+        而每个需要用到特殊变量的线程控制，应该要显式地绑定。
+        这代表着任何误用特殊变量的情况，
+        会引起一个 “unbound variable” 错误，
+        而每个线程只会看到变量自己的值。
+        有默认全局数值的变量通常是在线程创建时绑定。
+        你应该使用适合的架构来自动妥善地宣告这样的变量。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="赋值">
+    <SUMMARY>
+      使用赋值形式要一致。
+    </SUMMARY>
+    <BODY>
+      <p><!--- NTR -->
+        有很多种风格来处理宏与副作用；
+        无论是使用那种包，保持使用一致的风格。
+        当开始写一个新包时，选择一个最有理的风格。
+      </p>
+      <p>
+        关于同一个形式里的多重赋值，有两种学派：
+        第一种学派认为仅可能将赋值都放在一个
+        <code>SETF</code> 或 <code>PSETF</code> 形式里，
+        这样可以将带有副作用的形式减到最少；
+        第二种学派认为将赋值尽可能分成单一的 <code>SETF</code>
+        （或 <code>SETQ</code>，参见下面） 形式，
+        这样可以将有改动位置的形式定位，
+        使得 grep 寻找 <code>(setf (foo ...</code> 找到的机率上升到最高。
+
+        一个 grep 模式必须包含所有你在程序中可能有改动到位置的形式，
+        这样是具有说服力或是毫无意义的，取决于其馀代码的风格。
+        应该遵循你正在使用的包，里面所使用的惯例。
+        针对新的包来说，我们推荐第一种。
+      </p>
+      <p>
+        关于 <code>SETF</code> 以及 <code>SETQ</code>，
+        有两种学派：
+        第一种学派认为 <code>SETQ</code> 是前人遗留的实现细节，
+        尽量避免使用它，偏好使用 <code>SETF</code>；
+        第二种学派认为 <code>SETF</code> 加了一层额外的复杂度，
+        尽量避免使用它，尽可能使用 <code>SETQ</code>
+        （也就是说，每当一个被赋值的位置是变量或 symbol-macro 时）。
+        应当遵守你正使用的包里的惯例。
+        针对新的包来说，我们推荐第一种。
+      </p>
+      <p>
+        以函数式风格为主的主要精神是，
+        让测试与维护变得更简单，
+        我们邀请你想想如何用最少的赋值来完成事情。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="断言与条件式">
+    <SUMMARY>
+      你必须正确地使用断言与条件式。
+    </SUMMARY>
+    <BODY>
+      <ul>
+        <li>
+          <code>ASSERT</code> 应该只在侦测内部错误时使用。
+          程序应该 <code>ASSERT</code> 那些不变的值，
+          一旦 <code>ASSERT</code> 失败就表示软件哪里坏掉了。
+          不正确的输入应该在运行期妥善地处理，
+          并绝对不要产生违反断言的状况。
+          观赏断言失败的观众是开发者。
+          不要在 <code>ASSERT</code> 里使用 data-form 以及 argument-form
+          来指定要捕捉什么条件。
+          出于调试的目的，使用他们来印出信息没问题的
+          （而这仅用来调试，不会有国际化的问题）。
+        </li>
+        <li>
+          <code>CHECK-TYPE</code>,
+          <code>ETYPECASE</code> 也是断言的形式。
+          当某一个失败时，就找到了一个错误。
+          针对函数的输入，
+          应该偏好使用 <code>CHECK-TYPE</code> 胜于 <code>(DECLARE (TYPE ...))</code>。
+        </li>
+        <li>
+          代码应该要可以自由地使用断言及类型检查。
+          及早发现错误，及早修补！
+          只有在性能非常要求的地方，还有内部的辅助函数，
+          应该避开显式的断言及类型检查。
+        </li>
+        <li>
+          不合法的输入，像是读取的文件与预期格式不符，
+          不应视为违反断言。总是检查输入，确保是合法的，
+          并在不合法的情况下，用适当的行动回应，
+          像是捕捉一个实际错误。
+        </li>
+        <li>
+          <code>ERROR</code> 应用来侦测用户数据、请求、许可的问题等，
+          或是回报不寻常的输出给调用者。
+        </li>
+        <li>
+          <code>ERROR</code> 应该始终被一个显式的条件类型调用；
+          应当永远不要仅用一个字串来调用。
+          这样才可能国际化。
+        </li>
+        <li>
+          通过捕捉状况，回报不寻常输出的函数，应当在合约里明显说明；
+          当函数捕捉了一个状况，而状况不是在合约规范里时，
+          这是一个错误。
+          合约应清楚说明有状况类别。
+          函数则可以捕捉任何与那些状况同类的状况。
+          也就是说，记录在合约中类别的子类，
+          捕捉这些子类的实例是没问题的。
+        </li>
+        <li>
+          复杂的错误检查可能需要使用 <code>ERROR</code>
+          而不是 <code>ASSERT</code>。
+
+        </li>
+        <li>
+          在撰写一个服务器时，绝对不要调用 <code>WARN</code>。
+          而是应该使用合适的记录框架。
+
+        </li>
+        <li>
+          代码绝对不要调用 <code>SIGNAL</code>。
+          而是使用 <code>ERROR</code> 或 <code>ASSERT</code>.
+        </li>
+        <li>
+          代码不应该使用 <code>THROW</code> 以及 <code>CATCH</code>；
+          而是使用 <code>restart</code> 工具。
+        </li>
+        <li>
+          代码不应该全盘处理所有的状况，
+          比如说，类别 <code>T</code> ，或是使用 <code>IGNORE-ERRORS</code>。
+          而是让未知的状况交给万能救星 Lisp 来处理。
+          <!--- standard ultimate handler = 万能救星 Lisp -->
+        </li>
+        <li>
+          有少数场合，处理所有的状况是可以的，但这情况很少。
+          问题在于处理所有的状况，可能隐蔽了程序的错误。
+          如果你真的需要处理"所有的状况"，
+          你必须只处理 <code>ERROR</code>，绝对不要处理 <code>T</code>
+          以及绝对不要处理 <code>SERIOUS-CONDITION</code>。
+          （这是需要注意的，因为在 CCL 里，进程会不会终止，
+          取决于有没有捕捉到 <code>process-reset</code>，
+          并会交由 CCL 的处理器来处理，所以我们绝对不要插手。）
+        </li>
+        <li>
+
+          <code>(error (make-condition 'foo-error ...))</code>
+          等价于 <code>(error 'foo-error ...)</code> ──
+          代码必须使用简洁的形式。
+        </li>
+        <li> <!--- NTR, Need to Refactor -->
+          在清除形式的 <code>UNWIND-PROTECT</code> 里，不应该捕捉状况
+          （除非他们总是在这形式里处理）。
+          不然就从清除形式跳出，
+          比如 <code>INVOKE-RESTART</code>。
+        </li>
+        <li>
+          不要通过重新捕捉来结束一个状况。
+          如果你这么干，而刚刚的状况没有处理，
+          则栈的追踪会停在重新捕捉那点，
+          将之前的隐藏起来。
+          而隐藏起来的那部分，才是我们所关心的！
+          <BAD_CODE_SNIPPET>
+            ;; 差劲
+            (handler-case
+              (catch 'ticket-at
+                (etd-process-blocks))
+              (error (c)
+                (reset-parser-values)
+                  (error c)))
+          </BAD_CODE_SNIPPET>
+          <CODE_SNIPPET>
+            ;; 较佳
+            (unwind-protect
+              (catch 'ticket-at
+                (etd-process-blocks))
+              (reset-parser-values))
+          </CODE_SNIPPET>
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="类型检查">
+    <SUMMARY>
+      如果你知道某个东西的类型，
+      为了要启用合理的编译期与运行期检查，你应该明确指明它的类型。
+    </SUMMARY>
+    <BODY>
+      <p>
+        如果你的函数正使用特殊变量作为隐式参数，
+        帮特殊变量放一个 <code>CHECK-TYPE</code> 是很好的，
+        这有两个理由：
+        第一，给阅读代码的人留下线索，这个变量是隐式地作为参数；
+        第二，帮助找到错误。
+      </p>
+      <p>
+        使用 <code>(declare (type ...))</code>
+        是万不得已的手段，Scott McKay 如是说：
+      </p>
+      <blockquote>
+        <p>
+          事实上，<code>(declare (type ...))</code> 根据编译器速度、
+          安全性、等等设定的不同，做出不一样的事情。
+          在某些编译器，速度比安全重要时，<code>(declare (type ...))</code>
+          会告诉编译器"请假设变量是这些类型"而不做任何类型检查。
+          也就是说，如果某个变量的值是 <code>1432</code>，
+          而你却说它的类型是 <code>string</code>，
+          编译器听信于你，并将它当成一个字串来使用。
+        </p>
+        <p>
+          道德底线：不要使用 <code>(declare (type ...))</code>
+          来声明任何 API 函数的合约，这样做是不对的。
+          当然在“辅助函数”可以使用，但不是 API 函数。
+        </p>
+      </blockquote>
+      <p>
+        当然你应该在内部底层函数里，使用适当的声明。
+        这些声明被用来优化代码。当你这么做的时候，
+        看看我们关于<a href="#危险操作">危险操作</a>的建议。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="Common Lisp 对象系统">
+    <SUMMARY>
+      适当地使用 CLOS。
+    </SUMMARY>
+    <BODY>
+      <p>
+        当一个通用函数打算被其它模组调用时（其它部分的代码），
+        应该要有一个显式的 <code>DEFGENERIC</code> 形式，
+        以及一个 <code>:DOCUMENTATION</code> 字串解釋函數的通用合約
+        （與某些特定類別解釋行為相反）。
+        一般寫显式的<code>DEFGENERIC</code> 形式是好的，
+        但在模組进入点來說是必须要写的。
+      </p>
+      <p>
+        当通用函数的参数列表包含了
+        <code>&amp;KEY</code> 时，
+        <code>DEFGENERIC</code> 应总是将所有可接受的关键字参数列出来，
+        并解释它们各代表着什么。
+        （Common Lisp 没有要求这么做，
+        但从可以避免 SBCL 产生不实的警告来说，这么做是好的。）
+      </p>
+      <p>
+        你应该避免使用 <code>SLOT-VALUE</code> 以及 <code>WITH-SLOTS</code>，
+        除非你完全想要回避，任何种类的方法结合对槽带来的影响。
+        稀少的例外包括了
+        <code>INITIALIZE-INSTANCE</code> 以及 <code>PRINT-OBJECT</code> 方法，
+        还有访问隐藏在底层里，提供用户可视抽象的实现方法。
+        不然你应该使用
+        <code>WITH-ACCESSORS</code> 访问器。
+      </p>
+      <p>
+        访问器的名称一般遵循
+        <code>&lt;protocol-name&gt;-&lt;slot-name&gt;</code> 的惯例，
+        其中“协议”在这个情况下，松散地指出了一组行为定义良好的函数。
+      </p>
+      <p><!--- NTR, Need To Refactor-->
+        是需要把正式的“协议”概念设计成不可实作，
+        就像第一类“协议”的对象没有实作那样。
+        但也可以是一个抽象 CLOS 类，或是一个嵌入协议的
+        <a href="http://common-lisp.net/~frideau/lil-ilc2012/lil-ilc2012.html">Interface-Passing Style</a> 介面。
+        之后的（子）类或（子）介面，则可以通过给协议中的（通用）函数，
+        定义某些方法来实现协议部分或全部内容，包含了读取器及写入器。
+      </p>
+      <p><!--- NTR, Need To Refactor-->
+        举例来说，如果有一个象徵性的协议称为
+        <code>pnr</code> ，有着访问器：
+        <code>pnr-segments</code>、<code>pnr-passengers</code> 以及
+        <code>pnr-passengers</code> ，则
+        <code>air-pnr</code>、<code>hotel-pnr</code> 及
+        <code>car-pnr</code> 类别只能给
+        <code>pnr-segments</code> 及 <code>pnr-passengers</code> 合理地实作方法，
+        来作为访问器。
+      </p>
+      <p>
+        默认行为下，抽象基类名称拿来作为象徵性的协议名，
+        所以访问器名称默认是 <code>&lt;class-name&gt;-&lt;slot-name&gt;</code>；
+        当这些名称常常使用时，
+        就不再偏好或需要用这个形式。
+        一般来说呢，这使得符号名"更长了"，<!--symbol bloat-->
+        而且在许多情况里，会导致 "trampoline" 方法散布开来。
+      </p>
+      <p>
+        不应该使用由 <code>&lt;slot-name&gt;-of</code> 命名的访问器。
+      </p>
+      <p>
+        显式的 <code>DEFGENERIC</code> 形式应在通用方法
+        （或是将来可能）超过一个以上的 <code>DEFMETHOD</code> 情况使用。
+        这个理由是通用函数的文档解释函数的抽象合约，
+        而不是解释每个方法给哪些具体的类别做什么。
+      </p>
+      <p>
+        再没有一个象徵性协议时，绝对不要使用通用函数。
+        更具体来说，如果你有超过一个通用函数，且特化 N 个参数，
+        所有正特化的类别，全部都应当是一个单类的子孙。
+        通用函数绝对不要用来实现"重载"，也就是说，
+        只在拿来表示两个完全无关的类别的情况下使用。
+      </p>
+      <p>
+        更精确的说，并不是他们需要从一个常见的超类演化而来，
+        而是他们需要遵守同样的“协议”。
+        也就是两个类别应处理同一组通用函数，
+        就像是每个方法都有一个显式的 <code>DEFGENERIC</code> 存在一样。
+      </p>
+      <p>
+        以下是另一种说法。
+        假设你有两个类别，甲跟乙，以及一个通用函数丁。
+        丁有两个方法，分别派发类型甲与乙的参数。
+        也许在程序的某个地方，有个函数调用了丁，
+        而传入的参数可能在运行期时，
+        属于类别甲，而某些时候属于类别乙，这样是合理的吗？
+        如果不合理的话，你可能正在使用重载，而且你不应使用单个通用函数。
+      </p>
+      <p><!--- NTR -->
+        这个规则有一个例外：
+        如果相应的参数代表同样事情时，用重载是没问题的。
+        通常一个重载会接受一个 X 对象，
+        以及其他接受 X 对象名称的对象，
+        可能是符号或是别的。
+      </p>
+      <p><!--- NTR -->
+        绝对不要在运行期使用 <a HREF="http://en.wikipedia.org/wiki/Metaobject#Metaobject_protocol">MOP</a> 的“调停”操作。
+        在编译期你也不应该使用 MOP 的"调停"操作。
+        在运行期时，MOP 的调停操作，
+        在最坏的情况下是个危险，最好的情况下是个效能问题。
+        在编译期时，宏应在第一轮就把事情办到定位，
+        而不是需要第二轮透过调停操作来事后修补；
+        但某些时候，修补是解决向前引用的必要手段，
+        且此时调停操作是允许的。
+        MOP 的调停对于互动式开发来说是一个极好的工具，
+        且你可以在开发及调试的过程中享受它的美妙；
+        但你不应当在一般应用里使用。
+      </p>
+      <p>
+        如果类定义创建了一个作为
+        <code>:READER</code>、<code>:WRITER</code>,
+        或是 <code>:ACCESSOR</code> 的方法，不要重定义该方法。
+        加入 <code>:BEFORE</code>、<code>:AFTER</code>
+        以及 <code>:AROUND</code> 这些辅助方法是可以的，
+        但不要重写主要方法。
+      </p>
+      <p>
+        在有关键字参数的方法里，
+        你必须永远使用 <code>&amp;KEY</code>，
+        即便是方法不在乎键的值是什么，
+        你也永远不应该使用 <code>&amp;ALLOW-OTHER-KEYS</code>。
+        只要关键字被任何通用函数的方法所接受时，
+        在通用函数里使用它是 OK 的，
+        即使同样的通用函数没有特别提到它。
+        这对于 <code>INITIALIZE-INSTANCE</code> 方法来说特别重要，
+        若是你使用了 <code>&amp;ALLOW-OTHER-KEYS</code>，
+        这会把调用 <code>MAKE-INSTANCE</code> 时，
+        检查拼错或是错误关键字的错误禁能！
+      </p>
+      <p>
+        一个典型的 <code>PRINT-OBJECT</code> 方法看起来可能像是这样：
+      </p>
+      <CODE_SNIPPET>
+        (defmethod print-object ((p person) stream)
+          (print-unprintable-object (p stream :type t :identity t)
+            (with-slots (first-name last-name) p
+              (safe-format stream "~a ~a" first-name last-name))))
+      </CODE_SNIPPET>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="元语言准则">
+  <STYLEPOINT title="宏">
+    <SUMMARY>
+      在适当的时机使用宏，这种情况很常见。
+      在适当的时机定义宏，这种情况很少见。
+    </SUMMARY>
+    <BODY>
+      <p>
+        宏带来了语法上的抽象，是个美妙的东西。
+        通过表明你想干什么，使你的代码更清晰，
+        同时不被实现细节给绑手绑脚<!--- bogged -->
+        （将那些细节抽象起来）。
+        通过消除那些冗赘及无关的细节。
+        使你的代码更简洁、可读性更高，
+        但鱼与熊掌不可兼得，
+        读者需要学习每个宏所带来的新语法概念。
+        而宏不应该滥用。
+      </p>
+      <p>
+        普遍的结论是在好的 Common Lisp 程序里，
+        不应该认出任何的<em>设计模式</em>。
+        唯一且只有一个的模式是：<em>使用语言本身</em>，
+        包含了定义及使用语法上的抽象。
+      </p>
+      <p>
+        每当宏可以使代码变清晰时，必须使用现有的宏，
+        通过将目的用更简洁的方式传达，这是很常见的。
+        当你的项目里有可用的宏，来表达你正使用的概念，
+        你必须使用宏，而不是写出概念的展开式。
+      </p>
+      <p>
+        新的宏应当在恰当时机下定义（很少）。
+        针对常见的宏，几乎已经由语言及多样的函式库所提供了，
+        根据你的程序大小，通常只会需要用到少数几个新的宏。
+      </p>
+      <p> <!--http://sbcl-internals.cliki.net/oaoom-->
+        你应该遵循 <a HREF="http://sbcl-internals.cliki.net/oaoom">
+        OAOOM</a> 经验法则（不超过两次）来定义一个新的抽象，
+        无论是否是语法的抽象：
+        如果特定的模式使用超过两次，那么应该将它抽象起来。
+        一个更精确决定何时使用抽象的规则是，
+        应该考虑到使用次数及每次使用的增益，
+        与阅读代码时需要习惯的时间成本来比较，
+        通常阅读代码需要习惯的时间成本较为重要，
+        因为好的代码通常仅写一次，会被许多人阅读许多次
+        （维护该程序的程序员，忘记代码之后也会重读）。
+        然而撰写宏所要花费的成本也要考虑进去；
+        但这么一来应当比较的是，程序员撰写可能有更高收益的代码的成本。
+      </p>
+      <p>
+        正确使用 Lisp 宏需要品味。
+        避免写复杂的宏，除非利明显大于弊。
+        宏使与你协作的开发者需要费劲来学你的宏，
+        所以你应该在只有获得的表达性超过了成本时，才使用宏。
+        和往常一样，当你不确定时，尽管找你的同事谘询，
+        由于没有大量的 Lisp 经验，
+        是很难来判断究竟该不该用宏。
+      </p>
+      <p>
+        绝对不要在函数可以办到的情况下使用宏。
+        也就是说，如果你正在写的东西的语义，
+        与一个函数的语义相符，那么你必须用函数写成，而不是宏。
+      </p>
+      <p>
+        绝对不要为了性能的原因，将一个函数转成一个宏。
+        如果评测器显示一个特定函数 <code>FOO</code> 有性能问题时，
+        将需求及评测结果适当地记录下来，并将 <code>FOO</code> 声明为内联：
+        <code>(declaim (inline foo))</code>。
+      </p>
+      <p>
+        你也可以使用一个编译宏作为加速函数执行的手段，
+        通过指定一个来源到来源的转换。
+        注意这会干扰到追踪与优化函数。
+      </p>
+      <p>
+        当你写一个由宏定义的宏时（一个产生宏的宏），
+        要特别清楚地注解、记录起来，
+        因为这种宏对于任何人来说都是很难理解的。
+      </p>
+      <p><!--- NTR -->
+        绝对不要在没有与开发系统的其他开发者，取得共识的情况下设置新的读取宏。
+        读取宏绝对不可以泄漏系统的信息，不论是泄漏给正使用读取宏的系统的客户，
+        或是泄漏给项目里的其它系统。
+        你必须使用如
+        <code>cl-syntax</code> 或 <code>named-readtables</code>
+        的软件，来控制读取宏是如何被使用的。
+        想要有一样读取宏的用户，可以使用和你一样的读取宏。
+        无论如何，你的系統必須在有或沒有使用讀取宏的情况下，都一样那么好用。
+      </p>
+      <p>
+        如果你的宏有一个参数，是一个 Lisp 形式，会在展开代码时被求值，
+        你应该将此参数用 <code>-form</code> 字尾命名。
+        这个惯例让使用宏的使用者更清楚哪些是会被求值的 Lisp 表达式，
+        而那些不是。
+        常见名称如 <code>body</code> 以及 <code>end</code> 是这个规则的例外。
+      </p>
+      <p>
+        当情况适用时，你应该仿效使用所谓的 <code>CALL-WITH</code> 风格。
+        这个风格在 <a href="http://random-state.net/log/3390120648.html">http://random-state.net/log/3390120648.html</a> 详细地解释了。
+        一般的原则是，宏被严格地限制在仅处理语法，而语义尽可能交由一般的函数处理。
+        因此，一个 <code>WITH-<em>FOO</em></code> 宏通常被限制在，
+        用来产生一个对辅助函数 <code>CALL-WITH-<em>FOO</em></code> 的调用，
+        其中参数由宏参数推导而来。
+        宏的 <code>&amp;body</code> 参数通常包在一个会成为主体的 lambda 表达式，
+        作为传给辅助函数的一个参数之一。
+      </p>
+      <p> <!--- NTR -->
+        语法与语义分离是个基本的风格法则，远超出 <code>WITH-</code> 宏所讨论的情况。
+        它的好处多多。
+        通过将语义隔离在宏之外，宏将变得更简单，更容易写对，并更少受到变化影响，
+        也使得开发与维护更容易。
+        用一个更简单语言 ── 无需分阶段的语言 ── 写成的语义，
+        使得维护与开发更容易。
+        无需重新编译所有使用宏的代码，就可以调试与更新语义函数也变得可能了。
+        出现在栈追踪的语义函数，同时帮助了调试使用了宏的函数。
+        宏的展开式更简短了，而每个展开式与其它展开式共享了更多代码，
+        这简少了每个展开式占用的内存，通常使执行变得更快。
+        先写语义函数是有道理的，然后在这之上写一个作为语法糖的宏。
+        应该使用这个风格，除非宏是用在考量到性能的循环；
+        既便是如此，看看关于优化的规则。
+      </p>
+      <p>
+        任何由宏创建的函数（闭包）应该要取名字，
+        这可以通过使用 <code>FLET</code> 来完成。
+        <!--- NTR -->
+        这也允许你声明一个有动态范围的函数（如果是的话 ── 往往便是 ── 请见下文关于<a HREF="#动态范围">动态范围</a>的内容）
+      </p>
+      <p><!--- NTR -->
+        如果一个宏调用包含了一个形式，
+        且宏展开式包含了不只一个该形式的复本，
+        形式可能被求值一次以上，则将其码成包含宏展开的形式，
+        并编译一次以上。
+        如果某人使用了这个宏，使用具有副作用或需要计算很久的形式，来调用这个宏，
+        这样的行为是不招人待见的（除非你有意要写一个像是 loop 的控制结构）。
+        一个避免这个问题的便捷方式是，仅对形式求值一次，
+        并将结果绑订制一个（产生的）变量。
+        有一个非常有用的宏，叫做 <code>ALEXANDRIA:ONCE-ONLY</code> ，产生会办到此事的代码。
+
+        同时看看 <code>ALEXANDRIA:WITH-GENSYMS</code> 是如何在产生的代码里，
+        创建某些暂时的变量。注意，如果你遵循我们的 <code>CALL-WITH</code> 风格，
+        你通常只展开代码一次，要嘛作为传给辅助函数的参数，
+        或是作为一个作为参数所传入的 lambda 表达式的主体；
+        因此你避开了上面所谈到的复杂性。
+      </p>
+      <p>
+        当你写一个有主体的宏时，比如一个 <code>WITH-xxx</code> 宏，
+        即使没有任何参数，你应该为他们预留位置。
+        不要让调用看起来像是
+        <code>(defmacro with-lights-on (&amp;body b) ...)</code>，
+        而是 <code>(defmacro with-lights-on (() &amp;body b) ...)</code>。
+        这么一来，如果在未来需要参数时，你可以添加它们，
+        而无需改变所有用到宏的代码。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="何时求值">
+    <SUMMARY>
+      当使用 <code>EVAL-WHEN</code> 时，你应该总是使用所有的
+      <code>(:compile-toplevel :load-toplevel :execute)</code>.
+    </SUMMARY>
+    <BODY>
+      <p>
+        Lisp 求值过程发生在很多时期，某些时期是相互交错的。
+        当撰写宏时，意识到这些时期。
+        <a HREF="http://fare.livejournal.com/146698.html">EVAL-WHEN 被认为对你的健康是有害的</a>。
+      </p>
+      <p>
+        总结上面那篇文章所述，
+        除非你正使用非常先进的宏术(macrology)，
+        不然在一个 <code>EVAL-WHEN</code> 唯一合法的组合是，
+        纳入所有的
+        <code>(eval-when (:compile-toplevel :load-toplevel :execute) ...)</code>。
+      </p>
+      <p>
+        每当你定义将会用在宏的，函数、类型、类别、常量、变量等，必须使用
+        <code>(eval-when (:compile-toplevel :load-toplevel :execute) ...)</code>。
+      </p>
+      <p>
+        忽略 <code>:execute</code> 通常是一个错误，因为它预防了加载源码，而不是 fasl 文件。
+        忽略 <code>:load-toplevel</code> 通常是一个错误
+        （除了改动 readtables 及 编译期设置之外），因为它预防了加载未来的文件，或是
+        互动地编译代码，此代码依赖在编译期产生的效果，除非当前文件是
+        <code>COMPILE-FILE</code> 在同个 Lisp 会话被编译的。
+        <!-- NS, Lisp session => Lisp 会话 -->
+      </p>
+      <p>
+        关于变量，注意宏可能也可能不会，在运行展开后代码的同一个进程里被展开，
+        绝对不要依赖编译期间及运行期的效果，因为它们在其他时间可能是可视，
+        也可能是不可视的。
+        但在宏仍有几个合法的变量用途：
+      </p>
+      <ul>
+        <li>
+          某些变量可能保有某种新定义或元数据的字典。
+          如果元数据在运行期（且/或其他文件里）视可视的，必须确定宏展开的代码，
+          在加载期间会将定义注册到这些元数据结构里。
+          除了在编译期会影响注册之外，通常顶层定义会展开成实现注册的代码。
+          如果代码没有在顶层展开，你可以使用 <code>LOAD-TIME-VALUE</code>
+          来获得好的效果。
+          在极端情况下，你可能需要使用
+          <code>ASDF-FINALIZERS:EVAL-AT-TOPLEVEL</code>。
+        </li>
+        <li>
+          某些变量可能保有暂时性的数据，这些数据只在文件的编译期使用，
+          并可以在文件编译完后清理掉。
+          预先定义这样的变量会包含 <code>*readtable*</code> 或
+          编译器内部的变量，有着当前的优化设置。
+          你可以常常将现有的及这种新的变量合并，使用
+          <code>ASDF</code> 的 hook 函数: <code>:AROUND-COMPILE</code>。
+        </li>
+      </ul>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="读取期求值">
+    <SUMMARY>
+      你应该节制地使用 <code>#.</code> 并必须避免读取期的副作用。
+    </SUMMARY>
+    <BODY>
+      <p>
+        标准的 <code>#.</code> 读取宏，会读入一个对象，
+        给对象求值，而读取器会返回结果的值。
+      </p>
+      <p>
+        绝对不要在有常见解决方式时，还使用读取宏，常见解决方式：
+        像是 <code>EVAL-WHEN</code> 在编译期对副作用求值，
+        使用一个普通的宏来返回在编译期计算的表达式，
+        使用 <code>LOAD-TIME-VALUE</code> 在加载期计算它。
+      </p>
+      <p>
+        读取期计算通常是一个让某物在编译期被求值的快速方式
+        （通常是“读取”期，但这两者是一样的）。
+        如果你使用这个，求值过程绝对不要有任何副作用，
+        并绝对不可以依赖任何变量的全局状态。
+        <code>#.</code> 应被视为一种强迫“常量摺叠”的方式，
+        够聪明的编译器会自己想出解决办法，当编译器不够聪明时，
+        差异就体现出来了。
+      </p>
+      <p>
+        另一个 <code>#.</code> 的用途是在该位置展开宏的等价，等价不是表达式，
+        也不是（准）引用，而是像 lambda 列表。然而若你发现自己 lambda 列表用的很多，
+        是时候想想，是不是该定义宏来取代 lambda 列表。<!--- NTR -->
+      </p>
+      <p>
+        每当你要使用 <code>#.</code> 的时候，
+        你应该考虑使用 <code>DEFCONSTANT</code> 以及它的变种，
+        大概在一个 <code>EVAL-WHEN</code> 来给值一个名字，
+        解释它代表着什么。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="求值">
+    <SUMMARY>
+      绝对不要在运行期使用 <code>EVAL</code>。
+    </SUMMARY>
+    <BODY>
+      <p>
+        真正适合用 <code>EVAL</code> 的地方很少，
+        且必须与审查者商量的情况很久才发生一次；
+        很容易被滥用。
+      </p>
+      <p>
+        如果你的代码在运行期时操作符号，
+        并需要获取符号的值，
+        使用 <code>SYMBOL-VALUE</code> 而不是 <code>EVAL</code>。
+      </p>
+      <p>
+        通常实际上你需要的是写一个宏，
+        而不是使用 <code>EVAL</code>。
+      </p>
+      <p>
+        你可能会试着要用一种语言中安全的子集，
+         <code>EVAL</code> 来作为求值表达式的捷径。
+        但这样用 <code>EVAL</code>，通常需要比建构一个特殊用途的求值器，
+        还要更详细地检查所有的输入。<!--- NTR -->
+      </p>
+      <p>
+        <code>EVAL</code> 可运用的场合有：
+      </p>
+      <ul>
+        <li>
+          用以实现交互的开发工具。
+        </li>
+        <li><!-- The build infrastructure -->
+          建构基础设施
+        </li>
+        <li>
+          测试框架的后门程序。
+          (绝对不要在上线的代码里，有这样的后门程序)
+        </li>
+        <li>
+          编译期摺叠常量的宏。
+        </li>
+        <li>
+          将定义注册到元数据结构的宏；
+          注册形式有时在编译期求值，宏展开式也是，
+          所以马上就可给其它宏所用。
+        </li>
+      </ul>
+      <p>
+        注意在后面的情况里，如果宏不是要在顶层所使用，
+        那么可能无法使这些定义可用于展开式的一部分。
+        同样的情形可能发生在 <code>DEFTYPE</code> 展开式里，或发生在宏所使用的帮助函数。
+        在这些情况里，实际上你可能需要在宏里使用
+        <code>ASDF-FINALIZERS:EVAL-AT-TOPLEVEL</code>。
+        这不仅会在宏展开期 <code>EVAL</code> 你的定义，使定义立即可用，
+        同时也会保留这个形式，加入到 <code>(ASDF-FINALIZERS:FINAL-FORMS)</code>，
+        此时你必须在文件编译结束时，将其纳入（或在需要用到形式前）。
+        这么一来，加载 fasl 文件的副作用就体现出来了，而无需在编译前先行编译；
+        在这两个情况里，形式在加载期都是可用的。
+        如果你忽略的话，通过抛出一个错误，
+        <code>ASDF-FINALIZERS</code> 确保形式是存在的。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="导入与导出">
+    <SUMMARY>
+      绝对不要在运行期使用 <code>INTERN</code> 或 <code>UNINTERN</code>。
+    </SUMMARY>
+    <BODY>
+      <p>
+        绝对不要在运行期使用 <code>INTERN</code>。
+        导入不仅会构造，也创建了一个不会被蒐集的持久符号，或给予访问内部符号的权限。
+        这给内存泄漏、服务攻击拒绝、未授权的内部访问、符号冲突等，打开了大门。
+      </p>
+      <p>
+        绝对不要为了比较关键字，而导入一个字串；
+        使用 <code>STRING=</code> 或 <code>STRING-EQUAL</code>。
+      </p>
+      <BAD_CODE_SNIPPET>
+        (member (intern str :keyword) $keys) ; 差劲
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (member str $keys :test #'string-equal) ; 较佳
+      </CODE_SNIPPET>
+      <p>
+        绝对不要在运行期使用 <code>UNINTERN</code>。
+        这可能会损坏依赖动态绑定的代码。
+        使得代码更难调试。
+        绝对不要动态地导入任何新符号，
+        因此你也不需要动态地导出任何东西。
+      </p>
+      <p>
+        当然可以用某些宏的实现，在编译期使用 <code>INTERN</code>，
+        即使是如此，通常更适当的是基于宏之上抽象起来，如：
+        <code>ALEXANDRIA:SYMBOLICATE</code> 或
+        <code>ALEXANDRIA:FORMAT-SYMBOL</code>
+        来创建你需要的符号。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="表示数据">
+  <STYLEPOINT title="NIL: 空表、假、以及我不知道">
+    <SUMMARY>
+      适当地使用或避免使用 NIL。
+    </SUMMARY>
+    <BODY>
+      <p>
+        <code>NIL</code> 可以有几个不同的解读：
+      </p>
+      <ul>
+        <li>
+          “逻辑假”
+          在这个情况里，使用 <code>NIL</code>。
+          你应该使用操作符 <code>NOT</code>
+          或判断式函数 <code>NULL</code> 来检验逻辑假。
+        </li>
+        <li>
+          “空列表”
+          在这个情况里，使用 <code>'()</code>。
+          （当调用宏的时候，要小心引用空表。）
+          当参数已知是正规列表时，
+          你应该使用 <code>ENDP</code> 来检验是否为空列表，
+          或者使用 <code>NULL</code>。
+        </li>
+        <li>
+          一个关于某个不确定值的陈述句。
+          在这个情况里，如果代码歧义不会带来任何危险的话，
+          你可以使用 <code>NIL</code>；
+          不然你应该使用一个明确的、具描述性的符号。
+        </li>
+        <li>
+          一个关于某个已知不存在的值的陈述句。
+          在这个情况里，你应该使用一个明确的、具描述性的符号，而不是 <code>NIL</code>。
+        </li>
+      </ul>
+      <p>
+        绝对不要在数据表示法里引入歧义，这会让无论是谁需要来调试代码的人偏头痛。
+        如果有任何歧义的危险存在，
+        你应该使用一个明确的、具描述性的符号或关键字，举个例子，
+        用使用 <code>NIL</code> 来代表同样的两件事。
+        如果你真的使用了 <code>NIL</code>，
+        必须确定之间的差异有完整的在文档里说明。
+      </p>
+      <p>
+        在许多语境里，
+        与其将“我不知道”作为一个特定值，
+        不如使用多个数值，
+        一个给已知的数值（有的话），
+        而另一个表示数值是否已知或找到。
+      </p>
+      <p>
+        在用数据库类别时，记住 <code>NIL</code> 不需要总是映射到
+        <code>'NULL'</code> （反之亦然）！
+        数据库的需求可能与 Lisp 的需求不太一样。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="别滥用列表">
+    <SUMMARY>
+      必须正确选择数据的表示法。
+      绝对不要滥用 <code>LIST</code> 数据结构。
+    </SUMMARY>
+    <BODY>
+      <p>
+        虽然在 1958 年，LISP 是“列表处理, LISt Processing”的简称，
+        但 Common Lisp 的后继者，从 80 年代起，
+        已经转变成为现代的程序语言，有着现代的数据结构。
+        必须在程序里使用正确的数据结构。
+      </p>
+      <p>
+        绝对不要在不适用的场合，滥用内置的（单链结的）<code>LIST</code> 数据结构，
+        即使 Common Lisp 让列表变得如此简单易用。
+      </p>
+      <p>
+        绝对不要使用列表，当手边算法有符合此性能特点时：
+        循序的对列表的所有内容做迭代。
+      </p>
+      <p>
+        可以这么使用列表的例外是，当预先知道列表长度会是很短的时候
+        （少于 16 个元素）。
+      </p>
+      <p>
+        列表数据结构通常（但不总是）适合让宏与被宏使用的函数在编译期使用：
+        Common Lisp 源代码用列表传递，但宏展开式及编译过程通常会
+        将源代码整个循序地过一遍。（切记先进的宏系统不直接使用列表，
+        而是使用抽象的语法对象，来追踪源代码的位置与作用域；
+        然而现今 Common Lisp 还没有如此先进的宏系统。）
+      </p>
+      <p>
+        另一个可以使用列表的例外是引入，会在编译期或加载期转成适当数据结构的字面常量。
+        有一个相对短的函数名，来从这样的常量建构程序的数据结构是很好的。
+      </p>
+      <p>
+        当列表不适合作为数据结构的许多情况下，
+        多样的函式库如：
+        <a href="http://cliki.net/cl-containers">cl-containers</a> or
+        <a href="http://cliki.net/lisp-interface-library">lisp-interface-library</a>
+        提供了许多不同的数据结构，应该可满足你程序的所有基本需求。
+        如果现有的函式库满足不了你的话，看看上面关于
+        <a href="#使用函式库">使用函式库</a> 以及
+        <a href="#开源代码">开源代码</a> 这两点。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="列表 x 结构 x 多值">
+    <SUMMARY>
+      你应该使用恰当的表示法，来表示多个类型。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该避免使用一个列表，作为存放相同类型的元素的容器。
+        绝对不要使用列表，作为在函数进出之间，传递不同类型的多重数值的手段。
+        某些时候使用列表当作临时的数据结构是很方便的，也就是说，
+        “列表的第一个元素是 FOO，而第二个是 BAR”，
+        但这应该少用，因为要记得这小小的惯例得花大大的心力。
+        绝对只在，解构函数参数列表或创建参数列表给 <code>APPLY</code> 应用至函数，
+        这两个情况下使用列表。
+      </p>
+      <p>
+        正确的将由数种异质类型数值所组成的对象，传递的方法是，
+        使用一个用 <code>DEFSTRUCT</code> 或 <code>DEFCLASS</code> 定义的结构。
+      </p>
+      <p>
+        应该只在函数返回少量数值时，来使用多重数值，
+        其中这些少量数值会被调用者直接解构，而不会将其作为参数传给之后的函数。
+      </p>
+      <p>
+        应该不要返回一个状况对象，作为多重数值的一个值。
+        你应该捕捉状况来表示一个不寻常的输出。
+      </p>
+      <p>
+        你应该捕捉一个状况，来表示一个不寻常的输出，
+        而不是依赖特别的返回类型。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="列表 x 点对">
+    <SUMMARY>
+      当操作列表时，使用恰当的函数。
+    </SUMMARY>
+    <BODY>
+      <p>
+        使用 <code>FIRST</code> 来访问列表的第一个元素，
+        <code>SECOND</code> 来访问第二个元素等。
+        使用 <code>REST</code> 来访问列表的尾端。
+        使用 <code>ENDP</code> 来检验是否是列表的底部。
+      </p>
+      <p>
+        当构元不是用来实现一个正规列表时，
+        使用 <code>CAR</code> 及 <code>CDR</code> 并
+        将其是为一对更通用的对象。
+        在这个上下文里，使用 <code>NULL</code> 来检验 <code>NIL</code>。
+      </p>
+      <p>
+        后者除了在 alist 之外很罕见，因为你应该在适当的场合使用结构与类别。
+        当你想要使用树的时候，使用数据结构的函式库。
+      </p>
+      <p>
+        当手动解构列表时，你可以例外地使用 <code>CDADR</code> 及其它列表的组合操作。
+        而不是使用一组列表访问函数。
+        在这个语境里，使用 <code>CAR</code> 及 <code>CDR</code>，而不是
+        <code>FIRST</code> 及 <code>REST</code> 也合情合理。
+        然而要记住的是，在这样的情况里，
+        用 <code>DESTRUCTURING-BIND</code> 或 <code>OPTIMA:MATCH</code>
+        可能更合适。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="列表 x 数组">
+    <SUMMARY>
+      当随机访问很重要时，使用数组而不是列表。
+    </SUMMARY>
+    <BODY>
+      <p>
+        <code>ELT</code> 在列表的时间复杂度为 <i>O(n)</i> 。
+        如果你想要随机访问一个对象的元素时，
+        用数组及 <code>AREF</code> 来取代。
+      </p>
+      <p>
+        有个例外是不是关键部分的代码可以使用，
+        还有已知列表的长度很短的情况。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="列表 x 集合">
+    <SUMMARY>
+      你应该只在长度非常短的情况下，将列表作为集合使用。
+    </SUMMARY>
+    <BODY>
+      <p>
+        使用列表来表示集合不是个好好点子，除非你知道列表的长度很短。
+        访问器的时间复杂度是 <i>O(n)</i>，
+        而不是原本的 <i>O(log n)</i>。
+        关于任意的大集合，使用平衡的二叉树，
+        比如使用 <code>lisp-interface-library</code>。
+      </p>
+      <p>
+        如果你仍坚持将列表作为集合使用，
+        不要只是为了搜寻而对列表调用 <code>UNION</code>。
+      </p>
+      <BAD_CODE_SNIPPET>
+        (member foo (union list-1 list-2)) ; 差劲
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (or (member foo list-1) (member foo list-2)) ; 较佳
+      </CODE_SNIPPET>
+      <p>
+        <code>UNION</code> 不仅有无谓的构造，
+        在某些实现里，时间复杂度还可能达到 <i>O(n^2)</i>，
+        就算在 <i>O(n)</i> 的情况，相对来说也是很慢的。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="适当形式">
+  <p>
+    你必须遵循函数、宏以及特殊形式的正确使用方式。
+  </p>
+  <STYLEPOINT title="定义常量">
+    <SUMMARY>
+      你必须给常量值使用正确的定义形式。
+    </SUMMARY>
+    <BODY>
+      <p>
+        我们主要用的 Lisp 系统，SBCL，非常挑剔，只要常量被重定义至一个
+        不 <code>EQL</code> 先前数值的新值时，会捕捉一个状况。
+        当定义不是数字、字符、或符号（包括布尔及关键字）的变量时，
+        绝对不要使用 <code>DEFCONSTANT</code>。
+        一致地使用不管你项目里所推荐的替代方案来取代。
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (defconstant +google-url+ "http://www.google.com/")
+        (defconstant +valid-colors+ '(red green blue))
+      </BAD_CODE_SNIPPET>
+      <p>
+        开源函式库可能使用了
+        <code>ALEXANDRIA:DEFINE-CONSTANT</code>
+        来定义非数字、字符及符号（包括布尔与关键字）的常量。
+        你可以使用 <code>:TEST</code> 关键字参数来
+        指定一个相等性的判断式。
+      </p>
+      <CODE_SNIPPET>
+        ;; 较佳，给开源代码:
+        (define-constant +google-url+ "http://www.google.com/" :test #'string=)
+        (define-constant +valid-colors+ '(red green blue))
+      </CODE_SNIPPET>
+      <p>
+        在优化像是 SBCL 或 CMUCL 的实现时要注意，
+        这么定义常量使得之后的重定义，不会 <code>UNINTERN</code> 符号，
+        并需要重新编译所有用到常量的代码。
+        这么做使得在 REPL 调试代码“更有趣了”，或可以即时布署代码更新。
+        如果“常量”在整个服务器进程生命周期，有可能会变成非常量时，
+        考虑到如期或不定期的代码补丁后，你应考虑使用
+        <code>DEFPARAMETER</code> 或 <code>DEFVAR</code> 来取代，
+        或是使用 <code>DEFINE-CONSTANT</code> 的变种，
+        建构于某些未来函式库之上，实现了全局词法而不是 <code>DEFCONSTANT</code>。
+        可以在这些情况中保留 <code>+plus+</code> 的惯例，
+        并记录参数作为常量的目的为何。
+      </p>
+      <p>
+        注意 <code>LOAD-TIME-VALUE</code> 可能可以帮助你避免掉
+        定义不必要的常量。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="定义函数">
+    <SUMMARY>
+      你应该正确使用
+      <code>&amp;OPTIONAL</code> 以及
+      <code>&amp;KEY</code> 参数。
+      不要使用 <code>&amp;AUX</code> 参数。
+    </SUMMARY>
+    <BODY>
+      <p>
+        你应该避免使用 <code>&amp;ALLOW-OTHER-KEYS</code>，
+        因为这使得函数的合约变得模糊不清。
+        几乎所有实际的函数（通用或不通用），都允许某组关键字，
+        对调用者来说，这些关键字用来作为契约的一部分。
+        如果你实现了通用函数的一个方法，且不需要知道某些关键字参数的值，
+        你应该明确的 <code>(DECLARE (IGNORE ...))</code>，
+        将所有你没有用到的参数忽略掉。
+        绝对不要使用 <code>&amp;ALLOW-OTHER-KEYS</code>，
+        除非你明确地想要在调用通用函数，
+        参数匹配这些特定方法的时候，禁止检查所有方法允许的关键字。
+        注意到通用函数的契约是属于 <code>DEFGENERIC</code>，
+        而不是 <code>DEFMETHOD</code>，这对于通用函数的调用者来说，
+        基本上只是通用函数的实现细节。
+      </p>
+      <p>
+        一个适用 <code>&amp;ALLOW-OTHER-KEYS</code> 的情况是，
+        当你为某些（在计算期或开发期间）可能会变的函数写包装器函数时，
+        并传入一个 plist 作为 <code>&amp;REST</code> 参数。
+      </p>
+      <p>
+        应该避免使用 <code>&amp;AUX</code> 参数，
+      </p>
+      <p>
+        应该避免同时使用 <code>&amp;OPTIONAL</code> 以及
+        <code>&amp;KEY</code> 参数，
+        除非指定关键字参数永远都没有意义，以及当选择性參數没有全都指定时。
+        当你的函数同时有 <code>&amp;OPTIONAL</code> 以及
+        <code>&amp;KEY</code> 参数时，绝对不要给 <code>&amp;OPTIONAL</code> 参数
+        用一个非 <code>NIL</code> 的缺省值。
+      </p>
+      <p>
+        为了让函式库有最大的可移植性，<code>DEFMETHOD</code> 的定义
+        应用 <code>(DECLARE (IGNORABLE ...))</code>
+        忽略所有没用到的参数。
+        如果你忽略 <code>(DECLARE (IGNORE ...))</code> 那些参数，
+        某些实现会发出错误讯息，而其它实现会在你没有
+        <code>(DECLARE (IGNORE ...))</code> 发出错误讯息。
+        <code>(DECLARE (IGNORE ...))</code> 在所有的实现都可用。
+      </p>
+      <p>
+        应该避免在函数里过度的嵌套绑定。
+        如果函数有大量的嵌套，你应该将其分成数个函数或宏。
+        如果这真的得是一个概念单元，
+        考虑使用像是 <code>FARE-UTILS:NEST</code> 的宏，
+        至少可以减少缩排的数量。
+        在典型的短函数里（四层或更少层的嵌套）使用 <code>NEST</code> 是差劲的，
+        但不在特别长的函数（十层或更多层的嵌套）里使用也是差劲的。
+        运用你的判断力并请教你的审查者。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="条件表达式">
+    <SUMMARY>
+      使用恰当的条件表达式。
+    </SUMMARY>
+    <BODY>
+      <p>
+        使用 <code>WHEN</code> 及 <code>UNLESS</code>，
+        当只有一个可能性时。
+        当有两个可能性时，使用 <code>IF</code>；
+        两个以上可能性时，使用<code>COND</code>。
+      </p>
+      <p>
+        但不要在一个 <code>IF</code> 子句里使用 <code>PROGN</code> ──
+        使用 <code>COND</code>、<code>WHEN</code> 或 <code>UNLESS</code>。
+      </p>
+      <p>
+        注意在 Common Lisp 里，
+        当条件不符合时，
+        <code>WHEN</code> 及 <code>UNLESS</code> 返回 <code>NIL</code>。
+        你可以利用这个特点。
+        尽管如此，如果你有一个具体的理由，坚持要返回什么值，
+        你可以使用一个 <code>IF</code> 来明确的返回 <code>NIL</code>。
+        你也可以相同地在 <code>COND</code> 的最后一个子句加入 else 子句：
+        <code>(t nil)</code>，                   <!--- fall-through -->
+        或 <code>(otherwise nil)</code> 作为 <cond>CASE</cond>
+        的最后一个情况，来强调条件式返回的值很重要，会在之后被使用。
+        当条件式用于副作用时，你应该避免使用 else 子句，
+      </p>
+      <p>
+        当 <code>AND</code> 及 <code>OR</code>
+        与 <code>IF</code>、<code>COND</code>、
+        <code>WHEN</code> 或 <code>UNLESS</code>
+        比起来，可以产生更简洁的代码并没有副作用时，
+        你应该偏好 <code>AND</code> 及 <code>OR</code>。
+        你也可使用一个 <code>ERROR</code> 作为 <code>OR</code> 最后一个子句的副作用。
+      </p>
+      <p>
+        应该只使用 <code>CASE</code> 以及 <code>ECASE</code> 来
+        比较数字、字符或符号（包括布尔与关键字）。
+        <code>CASE</code> 使用了 <code>EQL</code> 来比较，
+        所以字串、路径名以及结构不会如你想的那样比较，且
+        <code>1</code> 与 <code>1.0</code> 是不同的。
+      </p>
+      <p>
+        应该使用 <code>ECASE</code> 以及 <code>ETYPECASE</code>
+        优先于 <code>CASE</code> 及 <code>TYPECASE</code>。
+        即早捕捉到错误是比较好的。
+      </p>
+      <p>
+        应该完全不要使用 <code>CCASE</code> 或 <code>CTYPECASE</code>。
+        至少，你应该不要在服务器进程里使用他们，除非你有一个健壮的错误处理的基础建设，
+        并确保不会因此泄漏出敏感数据。
+        <code>CCASE</code> 与 <code>CTYPECASE</code> 的用途是交互使用，
+        如果数据或控制结构泄漏给攻击者时，可能会产生有趣的损害。
+      </p>
+      <p>
+        绝对不要在<code>CASE</code>里，使用没有目的的单引号。
+        以下是个常见错误：
+      </p>
+      <BAD_CODE_SNIPPET>
+        (case x ; 差劲: 没有匹配时，静静地返回 NIL
+          ('bar :bar) ; 差劲: 捕捉了引用
+          ('baz :baz)) ; 差劲: 也会捕捉引用
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (ecase x ; 较佳: 没有匹配时会回报错误
+          ((bar) :bar) ; 较佳: 不会匹配引用
+          ((baz) :baz)) ; 较佳: 理由同上
+      </CODE_SNIPPET>
+      <p>
+        <code>'BAR</code> 等于 <code>(QUOTE BAR)</code>，
+        代表当 <code>X</code> 是 <code>QUOTE</code> 时，
+        接下来的表达式会被执行 (<code>:bar</code>)，并继续匹配第二个子句
+        （虽然 <code>QUOTE</code> 已经被第一个子句捕捉了）。
+        通常不是你想要的情形。
+      </p>
+      <p>
+        在 <code>CASE</code> 形式里，
+        必须使用 <code>otherwise</code>，而不是 <code>t</code>。
+        来表达“如果其它都匹配失败的话，执行这个”。
+        必须使用 <code>((t) ...)</code>，
+        来表达“匹配符号 T” 而不是“全部都会匹配”。
+        同时你必须使用 <code>((nil) ...)</code>，
+        来表达“匹配符号 NIL” 而不是“什么都没匹配”。
+      </p>
+      <p>
+        因此，如果你想将布尔值 <code>NIL</code> 及 <code>T</code> 分别映射到
+        符号 <code>:BAR</code> 及 <code>:QUUX</code> ，应该避免前面的方式，
+        而使用后面所解释的方式。
+      </p>
+      <BAD_CODE_SNIPPET>
+        (ecase x ; 差劲: 没有实际的错误用例
+          (nil :bar)) ; 差劲: 什么都没匹配
+          (t :quux)) ; 差劲: 全部都会匹配
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (ecase x ; 较佳: 会确实捕捉非布尔值
+          ((nil) :bar)) ; 较佳: 匹配 NIL
+          ((t) :quux)) ; 较佳: 匹配 T
+      </CODE_SNIPPET>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="同一性 x 相等性 x 比较">
+    <SUMMARY>
+      当比较对象时，你应该使用恰当的判断式。
+    </SUMMARY>
+    <BODY>
+      <p>
+        Lisp 提供了四种通用的相等性判断式：
+        <code>EQ</code>、<code>EQL</code>、<code>EQUAL</code>
+        以及 <code>EQUALP</code>,
+        语义上有着微妙的差别。
+        此外， Lisp 提供了具体类型的判断式：
+        <code>=</code>、<code>CHAR=</code>、<code>CHAR-EQUAL</code>、
+        <code>STRING=</code> 以及 <code>STRING-EQUAL</code>。
+        知道这些函数的区别！
+      </p>
+      <p>
+        应该使用 <code>EQL</code> 来比较对象及符号的<em>同一性</em>。
+      </p>
+      <p>
+        绝对不要使用 <code>EQ</code> 来比较数字或字符。
+        两个 <code>EQL</code> 的数字或字符，在 Common Lisp 里不需要是 <code>EQ</code> 的。
+      </p>
+      <p>
+        当在 <code>EQ</code> 及 <code>EQL</code> 之间做选择时，
+        应该使用 <code>EQL</code>，除非你正写一个关系性能的底层代码。
+        <code>EQL</code> 简化了一类尴尬错误发生的机会（也就是数字或字符完全没比较的错误）。
+        关于 <code>EQ</code>，可能有一个微小的性能成本。
+        但在 SBCL 下，通常会将其整个编译。
+        <code>EQ</code> 等价于有类型声明的 <code>EQL</code> 。
+        使用 <code>EQ</code> 应视为用来作为优化手段的<a href="#危险操作">危险操作</a>。
+      </p>
+      <p>
+        应该使用 <code>CHAR=</code> 来比较大小写无关的字符，
+        而 <code>CHAR-EQUAL</code> 来比较大小写有关的字符。
+      </p>
+      <p>
+        应该使用 <code>STRING=</code> 来比较大小写有关的字串，
+        而 <code>STRING-EQUAL</code> 来比较大小写无关的字串。
+      </p>
+      <p>
+        一个使用 <code>SEARCH</code> 搜索字串的常见错误是提供
+        <code>STRING=</code> 或 <code>STRING-EQUAL</code> 作为
+        <code>:TEST</code> 函数。
+        <code>:TEST</code> 函数给定两种序列元素做比较。
+        如果序列是字串的话，则 <code>:TEST</code> 函数一次调用两个字符，
+        所以正确的测试是 <code>CHAR=</code> 或 <code>CHAR-EQUAL</code>。
+        如果你使用 <code>STRING=</code> 或 <code>STRING-EQUAL</code> ，
+        结果正如你预期的，但在某些 Lisp 实现里非常之慢。
+        举例来说，CCL (至少在 2008 年 8 月时)，在每次比较时，创建一个单字符的字串，
+        这代价是非常昂贵的。
+      </p>
+      <p>
+        还有，应该给 <code>STRING=</code> 或 <code>STRING-EQUAL</code> 使用 <code>:START</code> 及 <code>:END</code> 参数，而不是使用 <code>SUBSEQ</code>；
+        打个比方，应该使用 <code>(string-equal s1 s2 :start1 2 :end1 6)</code>
+        来取代 <code>(string-equal (subseq s1 2 6) s2)</code>。
+        这是比较推荐的，因为它没有构造。
+      </p>
+      <p>
+        应该使用 <code>ZEROP</code>、<code>PLUSP</code> 或
+        <code>MINUSP</code>，而不是用一个 <code>0</code> 或 <code>0.0</code>
+        的值来比较。
+      </p>
+      <p>
+        绝对不要给浮点数使用一个确切的比较，
+        由于浮点运算的本质会产生小的数值计算误差。
+        你应该把绝对值与一个临界值比较。
+      </p>
+      <p>
+        必须使用 <code>=</code> 来比较数字，
+        除非你要比较的是不等于 <code>0</code>、<code>0.0</code>
+        及 <code>-0.0</code> 的情况，这个情况应使用 <code>EQL</code>。
+        再次说明，绝对不要使用给浮点数使用确切的比较。
+      </p>
+      <p>
+        货币数量应该使用十进制（有理数）的数字，来避免浮点运算的复杂度及舍入误差。
+        像是 <a href="http://wukix.com/lisp-decimals">wu-decimal</a>
+        的函式库可能可以帮上忙；
+        再一次强调，如果函式库不能满足你的需求，看看上面关于
+        <a href="#使用函式库">使用函式库</a> 以及
+        <a href="#开源代码">开源代码</a> 的说明。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="迭代">
+    <SUMMARY>
+      给迭代使用恰当的形式。
+    </SUMMARY>
+    <BODY>
+      <p>
+        你应该使用简单的形式，像是
+        <code>DOLIST</code> 或 <code>DOTIMES</code>，
+        而不是使用 <code>LOOP</code>
+        简单的形式像是当你不需要使用 <code>LOOP</code>的工具，如绑定、蒐集、块返回时，这些简单的情况。
+      </p>
+      <p>
+        当可以避免 <code>LET</code> 嵌套时，
+        使用 <code>LOOP</code> 的 <code>WITH</code> 子句。
+        在代码会变得更清晰的情况下，你可以使用 <code>LET</code>，
+        来返回 <code>LOOP</code> 使用后所绑定的变量，
+        而不是使用一个笨拙的 <code>FINALLY (RETURN ...)</code> 形式。
+      </p>
+      <p>
+        在 <code>DOTIMES</code> 的主体中，不要设置迭代变量。
+        (若你这么做的话，CCL 会发出一个编译器警告。)
+      </p>
+      <p>
+        多数系统在当前包使用未修饰的符号来做为 <code>LOOP</code> 的关键字。
+        其他系统使用从 <code>KEYWORD</code>包而来的，实际关键字 <code>:keywords</code>，作为 <code>LOOP</code> 的关键字。
+        你必须与系统里所使用的惯例保持一致。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="输入与输出">
+    <SUMMARY>
+      使用恰当的输入与输出函数。
+    </SUMMARY>
+    <BODY>
+      <p>
+        当撰写一个服务器时，代码绝对不要将输出送至像是
+        <code>*STANDARD-OUTPUT*</code> 或 <code>*ERROR-OUTPUT*</code>
+        的标准流。
+        代码必须使用正确的记录框架，给调试输出信息。
+        我们是运行一个服务器，所以没有控制台！
+      </p>
+      <p>
+        代码绝对不要使用 <code>PRINT-OBJECT</code> 来与用户沟通 ──
+        <code>PRINT-OBJECT</code> 是只拿来做调试的。
+        改动任何 <code>PRINT-OBJECT</code> 方法绝对不可以破坏任何
+        公共介面。
+      </p>
+      <p>
+        当可以使用单一的 <code>FORMAT</code> 字串，
+        就应该不要使用一系列的 <code>WRITE-XXX</code>。
+        使用 format 允许你参数化控制字串，以备不时之需。
+      </p>
+      <p>
+        应该使用 <code>WRITE-CHAR</code> 来输出一个字符，
+        而不是 <code>WRITE-STRING</code> 来输出单字符的字串。
+      </p>
+      <p>
+        应该不要使用 <code>(format nil "~A" value)</code>；
+        而是用 <code>PRINC-TO-STRING</code> 来取代。
+      </p>
+      <p>
+        应该在格式化字串里使用 <code>~&lt;Newline&gt;</code> 或
+        <code>~@&lt;Newline&gt;</code> 使编辑视窗落在 100 栏，
+        或将小节或子句缩排，使他们的可读性更高。
+      </p>
+      <p>
+        应该不要在 format 控制参数里使用 <code>STRING-UPCASE</code> 或
+        <code>STRING-DOWNCASE</code>；
+        应该使用 <code>"~:@(~A~)"</code> 或 <code>"~(~A~)"</code> 来取代。
+      </p>
+      <p>
+        使用 <code>FORMAT</code> 条件指令时要谨慎。
+        很容易会忘掉某些参数，参数介绍如下：
+      </p>
+      <dl>
+        <dt>没有参数，如 <code>"~[Siamese~;Manx~;Persian~] Cat"</code></dt>
+        <dd>
+          接受一个格式化参数，参数应该是一个整数。
+          使用它来选择一个子句。子句是从零开始算的。
+          如果数字超出范围，就印出没有就好。
+          你可以通过在最后一个 <code>";"</code> 前印出 <code>":"</code>
+          来提供一个默认值。
+          比如 <code>"~[Siamese~;Manx~;Persian~:;Alley~] Cat"</code>
+          一个超出范围的参数会印出 <code>"Alley"</code>。
+        </dd>
+        <dt><code>:</code> 参数，比如 <code>"~:[Siamese~;Manx~]"</code></dt>
+        <dd>
+          接受一个参数。如果是 <code>NIL</code> 的话使用第一个子句，
+          不然使用第二个子句。
+        </dd>
+        <dt><code>@</code> 参数, 比如 <code>"~@[Siamese ~a~]"</code></dt>
+        <dd>
+          如果下个格式化参数为真，使用它但不接受参数。
+          如果为假，接受一个格式化参数，并印出没有。
+          （通常子句会使用格式化参数。）
+        </dd>
+        <dt><code>#</code> 参数，比如 <code>"~#[ none~; ~s~; ~s and ~s~]"</code></dt>
+        <dd>
+          使用参数的数目作为选择子句的数值。
+          其它与没有参数相同。
+          下面是个完整的示例：
+          <code>"Items:~#[ none~; ~S~; ~S and ~S~:;~@{~#[~; and~] ~S~^ ,~}~]."</code>
+        </dd>
+      </dl>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="优化">
+  <STYLEPOINT title="避免配置">
+    <SUMMARY>
+      应该避免配置不必要的内存。
+    </SUMMARY>
+    <BODY>
+      <p>
+        在一个有自动内存管理的语言里（像是 Lisp 或 Java），
+        白话的“内存泄漏”指的是，实际上有不需要的内存，却没有被回收，
+        因为仍然可以访问到这些内存。
+      </p>
+      <p>
+        创建对象时应该小心，
+        不要在他们用不到时，仍使它们可以访问。
+      </p>
+      <p><!--- NTR -->
+        下列在 Common Lisp 里，一个特别粗心大意的人会中的陷阱。
+        如果你创建了一个带有填充指针的数组，并在数组里放入对象，
+        并设置填充指针为 0，那些对象也仍是可访问的
+        （Common Lisp 规范说在填充指针之后仍可引用到整个数组）。
+      </p>
+      <p>
+        不要无谓的构造（也就是配置内存）。
+        垃圾回收不是魔法。
+        过度的构造通常是一个性能问题。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="危险操作">
+    <SUMMARY>
+      当有明确的性能需求时，绝对只能使用较快的危险操作，
+      而你可以记录下来为什么这是对的。
+    </SUMMARY>
+    <BODY>
+      <p>
+        Common Lisp 实现通常提供后门程序，将某些操作用一种不安全的方式快速算出。
+        举例来说，某些函式库提供算术操作，仅设计给定长术使用，
+        并在提供正确参数的情况下，较快的给出结果。
+        这样的风险是这些操作的结果在溢出时是不正确的，
+        并可能在不是传入定长数时有未定义的行为。
+      </p>
+      <p> <!--- NTR -->
+        更普遍地说，危险操作会比任何等价的安全操作更快的给出正确结果，
+        如果参数符合某些约束条件，比如类型正确并够小；
+        但要是参数不符合这些条件，操作可能会有未定义的行为，
+        像是使软件崩溃，或者更糟，给出错误的答案。
+        导航飞机的软件、性命攸关的装置、或是其他负责大量金钱的软件，
+        这样未定义的行为可能杀人或使人破产。
+        一定的速度有时可使软件分出高低，但这还不如做对事情的缓慢软件；
+        做不对事情的软件是净损失，但做对事的缓慢软件却可产生收益。
+      </p>
+      <p>
+        绝对不要在没有看过评测结果前，就定义或使用危险操作来优化。
+        并小心记录为什么使用这些危险操作是安全的。
+        危险操作应限制在内部函数里；应该谨慎记录使用错误参数，来使用这些危险操作有多危险。
+        应该只在包的内部函数里使用危险操作，并记录声明的用途，
+        由于使用错误类型的参数，来调用函数会导致未定义的行为。
+        在一个包导出的函数，使用 <code>check-type</code> 来消毒输入参数，
+        这样内部函数永远不会传入违法的值。
+      </p>
+      <p>
+        在某些编译器里，新的危险操作通常可通过类型声明及一个 <code>OPTIMIZE</code> 声明来定义，
+        其中声明有着够高的 <code>SPEED</code>，以及低的 <code>SAFETY</code>。
+        除了给上线代码提供更多速度外，在那些有类型推论的编译器上，
+        这样的声明可能比 <code>check-type</code> 断言来得更有用，尤其是在编译期找出错误的情况。
+        如果你将危险操作唤回较安全、较慢的优化设置，带类型推论的编译器可能将这些声明翻译成断言；
+        能在开发中找出程序里的动态错误，这是件好事，但这不要用在上线的代码，
+        因为这使的声明的目的不再是一个提升性能的技巧。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="动态范围">
+    <SUMMARY>
+      应该只在性能很关键时，使用 <code>DYNAMIC-EXTENT</code>
+      而你可以记录下来为什么这是对的。
+    </SUMMARY>
+    <BODY>
+      <p>
+        <code>DYNAMIC-EXTENT</code> 声明是一个
+        <a href="#危险操作">危险操作</a> 的特例。
+      </p>
+      <p>
+        一个 <code>DYNAMIC-EXTENT</code> 声明的目的，是通过当对象的生命周期在函数的动态范围时，减少垃圾回收的次数来改善性能。
+        这代表对象是在函数调用后的某个时候创建的，并函数存在后用任何方法都访问不到对象。
+      </p>
+      <p>
+        通过声明一个变量或局部函数 <code>DYNAMIC-EXTENT</code>，
+        程序员告诉 Lisp，他<em>断定</em>某个对象会是变量的值，或是函数定义的闭包，
+        在宣告变量的（最里面那个）函数内有动态范围的生命周期。
+      </p>
+      <p>
+        Lisp 实现则自由使用这些信息，使得程序运行的更快速。
+        通常 Lisp 实现可以利用知识来配置栈：
+      </p>
+      <ul>
+        <li>
+          创建列表来保存 <code>&amp;REST</code> 参数。
+        </li>
+        <li>
+          在函数内配置结构、向量与列表。
+        </li>
+        <li>
+          闭包。
+        </li>
+      </ul>
+      <p>
+        如果断言是错误的，也就是说，程序员的声明是错的，
+        结果可能是场<em>大灾难</em>：
+        Lisp 可能在函数返回之后终止，或永远吊在那儿，或 ──
+        最差的情况 ── 提供一个不正确的结果，确没有任何运行期错误！
+      </p>
+      <p>
+        即便断言是正确的，未来函数的改动可能引入违反断言的可能。
+        这提高了危险性。
+      </p>
+      <p>
+        在多数情况里，这样的对象是短命的。
+        现代的 Lisp 实现使用新一代的垃圾回收器，
+        已经可非常高效地处理这些情况。
+      </p>
+      <p>
+        因此，<code>DYNAMIC-EXTENT</code> 声明应节制使用。
+        必须只在如下情况使用：
+      </p>
+      <ol>
+        <li>
+          有某些好的理由可以支持性能会全面提升，并且
+        </li>
+        <li>
+          绝对确定断言为真的情况。
+        </li>
+        <li>
+          通常代码改变后会使声明变成假的情况很少发生。
+        </li>
+      </ol>
+      <p>
+        第一点是避免过早优化的特例。
+        像这样的优化只对某些频繁配置的对象有效，比如：“在一个内部循环里”。
+      </p>
+      <p>
+        注意到，判定一个函数不会逃出当前调用的动态范围是很容易的，
+        可以通过分析函数是在哪被调用的，以及传入的其它函数；
+        因此，你应该步步惊心的声明一个函数是 <code>DYNAMIC-EXTENT</code> 的，
+        但对这样的声明有太大的压力。
+        反过来说，要判定对象不会逃出当前调用的动态范围是很难的，
+        因为无法得知对象在未来函数改动后，会不会被绑定或是被赋给哪个变量。
+        因此，你应该步步惊心的声明一个变量是 <code>DYNAMIC-EXTENT</code> 的。
+      </p>
+      <p>
+        通常很难知道优化给性能带来多少提升。
+        当撰写一个是可重用函式库的函数或宏时，
+        无法未卜先知的知道代码运行的频率。
+        理想上，会有可用的工具，基于运行模拟的结果，来找出优化的可用性与适用性。
+        但实际上不是这么简单。
+        这是一个权衡措施。
+        如果你非常、非常确定断言为真（对象仅在动态作用域里使用），
+        并不知道会多常使用，且不容易测量出来，
+        则将其声明会比没有声明来得好。
+        （理想上要做这些测量会比实际来的简单。）
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="应用 x 化简">
+    <SUMMARY>
+      在适当的场合应该使用 <code>REDUCE</code> 而不是 <code>APPLY</code>。
+    </SUMMARY>
+    <BODY>
+      <p>
+        你应该使用 <code>REDUCE</code> 而不是 <code>APPLY</code>，
+        以及一个由构元构造的列表。
+        <!--- where the semantics of the first operator argument -->
+        当然你必须使用 <code>APPLY</code> 如果它办到了你想要的事，
+        而 <code>REDUCE</code> 办不到的时候。举例来说，
+      </p>
+      <BAD_CODE_SNIPPET>
+        ;; 差劲
+        (apply #'+ (mapcar #'acc frobs))
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        ;; 较佳
+        (reduce #'+ frobs :key #'acc :initial-value 0)
+      </CODE_SNIPPET>
+      <p>
+        这是比较推荐的，因为它没有额外的构造，并没有超出参数限制的危险（用 <code>CALL-ARGUMENTS-LIMIT</code> 来查看），在某些实现里限制是很小的，长的列表可能把栈弄垮
+        （我们想避免代码含有没来由的不可移植性）。
+      </p>
+      <p>
+        然而当 <code>REDUCE</code> 增加了无谓的计算复杂度时，必须小心不要使用
+        <code>REDUCE</code>。
+        举例来说，<code>(REDUCE 'STRCAT ...)</code> 的复杂度为 <i>O(n^2)</i>，
+        在一个适当的实现里仅需要 <i>O(n)</i>。
+        此外，<code>(REDUCE 'APPEND ...)</code> 的复杂度也是 <i>O(n^2)</i>，
+        除非你指定从尾端开始（<code>:FROM-END T</code>）。
+
+        在这些情况里，绝对不要使用 <code>REDUCE</code>，也不要用 <code>(APPLY 'APPEND ...)</code>。反之必须从合适的函式库挑个正确的抽象来用（可能是你有贡献的函式库），适当地处理这些情况，而不是让用户烦恼实现细节。例子可参见 <code>UIOP:REDUCE/STRCAT</code>
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="避免 NCONC">
+    <SUMMARY>
+      应该避免使用 <code>NCONC</code>；
+      应该使用 <code>APPEND</code> 来取代，或是更好的数据结构。
+    </SUMMARY>
+    <BODY>
+      <p>
+        应该永远不要使用 <code>NCONC</code>。
+        当不依赖任何副作用时，应该使用 <code>APPEND</code>。
+        当需要更新变量时，应该使用 <code>ALEXANDRIA:APPENDF</code>。
+        不要依赖通过 <code>CDR</code> 操作当前构元来完成某事（某些人可能会争论说，这只是建议而不是规范）；
+        而如果你这么做的话，必须附上一个明显的注解，
+        解释 <code>NCONC</code> 的用途；
+        而你应该重新考虑你呈现数据的方式。
+      </p>
+      <p>
+        通过扩充，你应该避免 <code>MAPCAN</code>，
+        或 <code>NCONC</code> （这里 NCONC 作动词） <code>LOOP</code> 的特性。
+        取而代之的是，应该分别使用 <code>ALEXANDRIA:MAPPEND</code>
+        以及 <code>APPEND</code> 来处理 <code>LOOP</code> 的特性。
+      </p>
+      <p>
+        <code>NCONC</code> 鲜少是个好想法，由于它的时间与空间复杂度都没有比
+        <code>APPEND</code> 来得好，一般常识下，没有人会共享有副作用的列表，
+        且它的错误复杂度更是高于 <code>APPEND</code>。
+      </p>
+      <p>
+        如果由于 <code>APPEND</code> vs <code>NCONC</code> 碰到了性能瓶颈，
+        这是一个程序的限制因素，
+        你的问题大了且你可能正使用错误的数据结构：
+        你应该使用有着常量时间的 append (参见 <a HREF="http://www.amazon.com/Purely-Functional-Structures-Chris-Okasaki/dp/0521663504">Okasaki 的书</a>，并将它们加入 lisp-interface-library)，或更简单点，你应该用一个树来累积数据，
+        在累积期完成后，树变扁平，且只会变一次，时间是线性时间。
+      </p>
+      <p>
+        你只可能在性能重要的底层函数里，使用 <code>NCONC</code>、<code>MAPCAN</code>
+        或 <code>NCONC</code> <code>LOOP</code> 的特性，
+        其中列表的用途作为一个合法的数据结构，因为这些列表的长度已知是很短的，
+        且当函数或表达式被累积时，在合约里明确的保证仅返回新的列表（新的列表不可以是常量的引号或反引号表达式）。即使如此，这样子使用原语必须是稀少的，且需要撰写良好的文档。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+<CATEGORY title="陷阱">
+  <STYLEPOINT title="函数 FUN? 引用 FUN?">
+    <SUMMARY>
+      你平时应该使用 <code>#'FUN</code> 来引用函数 FUN，
+      而不是使用 <code>'FUN</code>。
+    </SUMMARY>
+    <BODY>
+      <p>
+        前者，念作 <code>(FUNCTION FUN)</code>，
+        指的是函数对象 FUN，并有正确的作用域。
+        后者，念作 <code>(QUOTE FUN)</code>，
+        指的是符号 FUN，在调用时使用了符号的 <code>FDEFINITION</code>。
+      </p>
+      <p>
+        当使用一个接受函数式参数的函数时（如：<code>MAPCAR</code>、<code>APPLY</code>、
+        <code>:TEST</code> 以及 <code>:KEY</code> 参数），
+        你应该使用 <code>#'</code> 来引用函数，而不只是单引号。
+      </p>
+      <p>
+        一个例外是当你明确地想要动态连接时，因为你预期全局函数的绑定会被更新。
+      </p>
+      <p>
+        另一个例外是当你明确地想要访问一个全局函数的绑定，并避免遮蔽了词法绑定的可能性。
+        这不应该会常常发生，因为当你想要使用被遮蔽的函数时，
+        再来遮蔽一个函数，是一个很差的想法；
+        给词法函数使用另一个名称不就好了。
+      </p>
+      <p>
+        必须在所有地方一致地使用 <code>#'(lambda ...)</code> 或
+        没有 <code>#'</code> 的 <code>(lambda ...)</code>。
+        不像是 <code>#'symbol</code> vs <code>'symbol</code> 的情形，
+        这两者只是语法上的差异，不对语义造成影响，<!--- works on Genera? -->
+        除非前者可在火星上工作，而后者不行。
+
+        若你的代码预期要作为，一个兼容所有 Common Lisp 实现的函式库，
+        你必须使用前者的风格；不然，使用哪个风格取决于你。
+        <code>#'</code>可以理解成一个提示，你正用表达式语境来导入一个函数；
+        但 <code>lambda</code> 本身通常就是足够的提示，
+        且简洁是好的。
+        聪明地选择，但综观上述，
+        与其他的开发者保持一致，在一个同样的文件、包、系统、项目等。
+      </p>
+      <p>
+        注意，如果你大量使用函数式风格，开始写一个新的系统，
+        你可能会考虑使用 <a href="http://cliki.net/lambda-reader">lambda-reader</a>，
+        一个让你使用像是 <code>λ</code> 字符的系统，而不是写 <code>LAMBDA</code>。
+        但你绝对不要在一个现有的系统里，在没有获得其他开发者的允许下，使用这样的语法扩充。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="路径名">
+    <SUMMARY>
+      Common Lisp 路径名非常棘手。小心陷阱。使用 <code>UIOP</code>。
+    </SUMMARY>
+    <BODY>
+      <p>
+        要正确处理 Common Lisp 的路径名是相当困难的。
+      </p>
+      <p>
+        <code>ASDF 3</code> 带有可移植的函式库 <code>UIOP</code>
+        使得在 Common Lisp 里处理可移植的路径名变得 <em>非常</em> 简单。
+        应该在适当的情况下使用这个库。
+      </p>
+      <p>
+        首先，注意 Common Lisp 路径名之间的差异，
+        路径名依赖实现及你正使用的操作系统，
+        以及系统的原生语法。
+        Lisp 语法可能牵扯到引用特殊字符，像是
+        <code>#\.</code> 以及 <code>#\*</code> 等，
+        除了字串里 <code>#\\</code> 及 <code>#\"</code> 的引用之外。
+        相比之下，系统中的其他语言（Shell, C, 脚本语言）可能
+        只有一层引用来转成字串。
+      </p>
+      <p>
+        第二，当使用 <code>MERGE-PATHNAMES</code> 时，
+        注意 <code>HOST</code> 组件的处理方式，这对于非 Unix 平台很重要
+        （甚至是某些 Unix 实现也很重要）。
+        你应该使用 <code>UIOP:MERGE-PATHNAMES*</code>
+        而不是 <code>MERGE-PATHNAMES</code>，
+        特别是若你期望相对路径能像本来在 Unix 或 Windows 里那样工作的话；
+        不然可能会在某些实现里碰到古怪的错误，将绝对路径与相对路径合并，
+        造成覆写绝对路径名的 host，且在相对路径名创建时，将 host 换成
+        <code>*DEFAULT-PATHNAME-DEFAULTS*</code> 的值。
+      </p>
+      <p>
+        第三，留意 <code>DIRECTORY</code> 在实现之间是不可移植的，
+        因为它们处理通配符、子目录、符号链接等，的方式不同
+        再一次， <code>UIOP</code> 提供了许多常见的抽象来处理路径名。
+      </p>
+      <p>
+        <code>LOGICAL-PATHNAME</code>们不是一个可移植的抽象，
+        并不应在可移植的代码里使用。
+        许多支援 <code>LOGICAL-PATHNAME</code> 的实现，都有错误存在。
+        SBCL 实现的非常好，但严格限制哪些是标准所允许的字符。
+        其它实现允许路径名有随意的字符，这么一来就不一致了，
+        并与其他系统在许多方面不兼容。
+        你应该使用其它的路径名抽象，像是
+        <code>ASDF:SYSTEM-RELATIVE-PATHNAME</code> 或
+        背后的 <code>UIOP:SUBPATHNAME</code> 与 <code>UIOP:PARSE-UNIX-NAMESTRING</code>。
+      </p>
+      <p>
+        最后，注意可能随时间改变的路径，在你建构 Lisp 映像及运行映像时会改变的路径。
+        你应该谨慎的重置你的映像，来修正不相关的建构期路径，
+        以及从当前环境变量来重新初始化任何查找路径。
+        举例来说 <code>ASDF</code> 需要你使用
+        <code>ASDF:CLEAR-CONFIGURATION</code> 来重置路径。
+        <code>UIOP</code> 提供了在 image 导出前的 hook，让你可以将有关变量重置或 <code>makunbound</code>。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+  <STYLEPOINT title="满足">
+    <SUMMARY>
+      在一个类型说明符里使用 <code>SATISFIES</code> 必须非常谨慎。
+    </SUMMARY>
+    <BODY>
+      <p>
+        大多数 Common Lisp 实现无法基于一个 <code>SATISFIES</code>类型来做优化，
+        但许多实现提供了简单的优化，基于此形式的类型：
+        <code>(AND FOO (SATISFIES BAR-P))</code>
+        其中 <code>AND</code> 子句的第一项描述了对象的结构，
+        没有使用任何的 <code>SATISFIES</code>，而第二项是
+        <code>SATISFIES</code>。
+      </p>
+      <BAD_CODE_SNIPPET>
+        (deftype prime-number () (satisfies prime-number-p)) ; 差劲
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (deftype prime-number () (and integer (satisfies prime-number-p)) ; 较佳
+      </CODE_SNIPPET>
+      <p>
+        然而，在 <code>DEFTYPE</code> 语言中的 <code>AND</code> 不是一般语言表达式中，
+        一个从左至右求值的短路操作符。
+        它是一个对称的连接器，允许重新排序子项，但不保证会有短路。
+        因此，在上例当中，
+        你不能依赖检验 <code>INTEGER</code> 整数性的测试，
+        来保护一个非整数的参数传入 <code>PRIME-NUMBER-P</code> 函数。
+        实现可能，且某些<em>将</em> 在编译期调用 <code>SATISFIES</code> 具体的函数，
+        来测试相关的对象。
+      </p>
+      <p>
+        这也是为什么在一个 <code>SATISFIES</code> 子句中指定的函数，必须接受任何类型的参数，
+        且必须在一个 <code>EVAL-WHEN</code> 里被定义（以及任何用到的变量或调用的函数）：
+      </p>
+      <BAD_CODE_SNIPPET>
+        (defun prime-number-p (n) ; 非常差！
+          (let ((m (abs n)))
+            (if (&lt;= m *prime-number-cutoff*)
+                (small-prime-number-p m)
+                (big-prime-number-p m))))
+      </BAD_CODE_SNIPPET>
+      <CODE_SNIPPET>
+        (eval-when (:compile-toplevel :load-toplevel :execute) ; 较佳
+          (defun prime-number-p (n)
+            (when (integerp n) ; 较佳
+              (let ((m (abs n)))
+                (if (&lt;= m *prime-number-cutoff*)
+                    (small-prime-number-p m)
+                    (big-prime-number-p m))))))
+      </CODE_SNIPPET>
+      <p>
+        特别的是，上述说明的代表着这个在 Common Lisp 标准里使用的
+        <a href="http://www.lispworks.com/documentation/HyperSpec/Body/t_satisf.htm">例子</a> 是错误的。
+        <code>(and integer (satisfies evenp))</code>
+        <em>不是</em>一个安全的、一致性的类型指定符，当传入非整数作为参数时，
+        <code>EVENP</code> 会抛出一个错误，而不是返回 <code>NIL</code>。
+      </p>
+      <p>
+        最后有一个要注意的是，当你的 <code>DEFTYPE</code> 代码展开成一个
+        有着动态产生的函数的 <code>SATISFIES</code>时：lly generated function:
+      </p>
+      <ul>
+        <li>
+          你不能控制实现会不会展开一个 <code>DEFTYPE</code>。
+        </li>
+        <li>
+          展开本身不能包含一个函数定义，或任何在表达式语言里的代码。
+          <!--- expression language -->
+        </li>
+        <li>
+          当展开式使用时，你控制不了它，
+          它可能发生在不同的进程，而进程没有展开它的定义。
+        </li>
+      </ul>
+      <p>
+        你不能使用 <code>EVAL</code> 在类型展开期只创建函数，来做为展开式的副作用。
+        解决办法是使用
+        <code>ASDF-FINALIZERS:EVAL-AT-TOPLEVEL</code> 来取代。
+        参见我们讨论 <a HREF="#EVAL">EVAL</a> 的最后一点。
+      </p>
+      <p>
+        Common Lisp 是...很难满足的。
+      </p>
+    </BODY>
+  </STYLEPOINT>
+</CATEGORY>
+
+<HR/>
+
+<small>致谢：
+   Adam Worrall, Dan Pierson, Matt Marjanovic, Matt Reklaitis,
+   Paul Weiss, Scott McKay, Sundar Narasimhan,
+   以及其他贡献者。
+   特别感谢 Steve Hain 以及先前的编辑者，
+   按时间反序排列，他们是 Dan Weinreb 及 Jeremy Brown。
+</small>
+
+<p align="right">
+修订版号 1.23
+</p>
+
+
+<address>
+Robert Brown
+</address>
+
+<address>
+  <a HREF="mailto:tunes@google.com">François-René Rideau</a>
+</address>
+
+<p>
+  Report Errors / Suggestions of Chinese translation:
+  <a HREF="https://github.com/JuanitoFatas/Google-Common-Lisp-Style-Guide/issues" TARGET="_blank">
+  Please open an issue on Github
+  </a>
+</p>
+
+<div id="disqus_thread"></div>
+<SCRIPT type="text/javascript">
+    var disqus_shortname = 'gclsg';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</SCRIPT>
+<noscript>
+  Please enable JavaScript to view the
+  <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com" class="dsq-brlink">
+  comments powered by <span class="logo-disqus">Disqus</span>
+</a>
+
+
+<SCRIPT type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37961277-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</SCRIPT>
+
+</GUIDE>
