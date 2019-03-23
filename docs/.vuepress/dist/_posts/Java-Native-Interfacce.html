@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>简单讲讲JNI | THE LOST SOUL</title>
+    <meta name="description" content="饿，呆。">
+    
+    
+    <link rel="preload" href="/assets/css/0.styles.382af5d5.css" as="style"><link rel="preload" href="/assets/js/app.5cd6af96.js" as="script"><link rel="preload" href="/assets/js/29.26a4f87f.js" as="script"><link rel="prefetch" href="/assets/js/10.7a4d1542.js"><link rel="prefetch" href="/assets/js/11.c27d1eb3.js"><link rel="prefetch" href="/assets/js/12.66eb6bda.js"><link rel="prefetch" href="/assets/js/13.be7eb1d6.js"><link rel="prefetch" href="/assets/js/14.e27d2be9.js"><link rel="prefetch" href="/assets/js/15.e4a36b5d.js"><link rel="prefetch" href="/assets/js/16.e05a0a02.js"><link rel="prefetch" href="/assets/js/17.a707574e.js"><link rel="prefetch" href="/assets/js/18.93a506e5.js"><link rel="prefetch" href="/assets/js/19.5c559cd4.js"><link rel="prefetch" href="/assets/js/2.c1232e1d.js"><link rel="prefetch" href="/assets/js/20.bd807e68.js"><link rel="prefetch" href="/assets/js/21.ed8589dd.js"><link rel="prefetch" href="/assets/js/22.4d4231da.js"><link rel="prefetch" href="/assets/js/23.23860884.js"><link rel="prefetch" href="/assets/js/24.673f6d1e.js"><link rel="prefetch" href="/assets/js/25.695f18a4.js"><link rel="prefetch" href="/assets/js/26.a524a242.js"><link rel="prefetch" href="/assets/js/27.8e0ffbab.js"><link rel="prefetch" href="/assets/js/28.44151725.js"><link rel="prefetch" href="/assets/js/3.0b979782.js"><link rel="prefetch" href="/assets/js/30.ad81027e.js"><link rel="prefetch" href="/assets/js/31.29d3fab7.js"><link rel="prefetch" href="/assets/js/32.35ad0810.js"><link rel="prefetch" href="/assets/js/33.bc4225a8.js"><link rel="prefetch" href="/assets/js/34.8bce609c.js"><link rel="prefetch" href="/assets/js/35.0ca28995.js"><link rel="prefetch" href="/assets/js/36.f95c8a1e.js"><link rel="prefetch" href="/assets/js/37.6a0f372f.js"><link rel="prefetch" href="/assets/js/38.91011887.js"><link rel="prefetch" href="/assets/js/4.836931cd.js"><link rel="prefetch" href="/assets/js/5.516025eb.js"><link rel="prefetch" href="/assets/js/6.a09fd880.js"><link rel="prefetch" href="/assets/js/7.50545f11.js"><link rel="prefetch" href="/assets/js/8.05a845e3.js"><link rel="prefetch" href="/assets/js/9.774afa1c.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.382af5d5.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">THE LOST SOUL</span></a> <div class="links" style="max-width:nullpx;"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <div class="sidebar"><!---->  <!----> </div> <div class="page"> <div class="content"><p>前段时间了解了Android NDK，也就是用c编写Android App以提高执行效率，好奇于它的实现原理，所以学习了JNI（Java Native Interface）。从Java 1.1开始，JNI标准成为java平台的一部分，它允许Java代码和其他语言写的代码进行交互。JNI一开始是为了本地已编译语言，尤其是C和C++而设计 的，但是它并不妨碍你使用其他语言，只要调用约定受支持就可以了。下面以经典的HelloWorld程序简单的讲一讲JNI：
+##Hello World</p> <div class="language-java HelloWorld.java extra-class"><pre class="language-java"><code><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HelloWorld</span><span class="token punctuation">{</span>
+  <span class="token keyword">public</span> <span class="token keyword">native</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//声明native方法，不可实现</span>
+  <span class="token keyword">static</span><span class="token punctuation">{</span>
+    System<span class="token punctuation">.</span><span class="token function">loadLibrary</span><span class="token punctuation">(</span><span class="token string">&quot;helloworld&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//加载动态库helloworld，加载后的动态库位于本地方法栈</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">new</span> <span class="token class-name">HelloWorld</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>结合上面的程序和JNI的名字Java Native Interface可以大概了解JNI的实现原理就是：使用native关键字定义一组接口用于连接其他语言的已编译好的模块。</p> <p>接下来在命令窗口中使用“javac HelloWorld.java”编译Java文件，会得到HelloWorld.class。接着使用”javah HelloWorld”得到如下的对应的C头文件HelloWorld.h：</p> <div class="language-c HelloWorld.h extra-class"><pre class="language-c"><code><span class="token comment">/* DO NOT EDIT THIS FILE - it is machine generated */</span>
+<span class="token macro property">#<span class="token directive keyword">include</span></span>
+<span class="token comment">/* Header for class HelloWorld */</span>
+
+<span class="token macro property">#<span class="token directive keyword">ifndef</span> _Included_HelloWorld</span>
+<span class="token macro property">#<span class="token directive keyword">define</span> _Included_HelloWorld</span>
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> __cplusplus</span>
+<span class="token keyword">extern</span> <span class="token string">&quot;C&quot;</span> <span class="token punctuation">{</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token comment">/*
+* Class: HelloWorld
+* Method: displayHelloWorld
+* Signature: ()V
+*/</span>
+JNIEXPORT <span class="token keyword">void</span> JNICALL Java_HelloWorld_sayHello
+<span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span><span class="token punctuation">,</span> jobject<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property">#<span class="token directive keyword">ifdef</span> __cplusplus</span>
+<span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+</code></pre></div><p>然后，你就可以根据这个头文件编写对应的c文件HelloWorld.c,比如下面这样：</p> <div class="language-c Helloworld.c extra-class"><pre class="language-c"><code><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;jni.h&gt;</span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&quot;HelloWorld.h&quot;</span></span>
+
+JNIEXPORT <span class="token keyword">void</span> JNICALL <span class="token function">Java_HelloWorld_sayHello</span><span class="token punctuation">(</span>JNIEnv <span class="token operator">*</span>env<span class="token punctuation">,</span> jobject obj<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">&quot;Hello world!!!&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>接着当然是编译c，这里以在Windows下编译为例，使用cl编译器，在c文件所在的路径下打开命令窗口，使用如下命令：</p> <div class="language- extra-class"><pre class="language-text"><code>cl -I &quot;%java_home%\include &quot;-I &quot;%java_home%\include\win32 &quot;-LD HelloWorld.c -Fe helloworld.dll
+</code></pre></div><p>最终会得到helloworld.dll，当然要使用cl需要配置环境，这里多加不赘述。</p> <p>最后，使用“java HelloWorld”运行最新编写的java程序，输出 Hello world!!!，这就是全部。</p></div> <div class="page-edit"><!----> <!----></div> <!----> </div> <!----></div></div>
+    <script src="/assets/js/app.5cd6af96.js" defer></script><script src="/assets/js/29.26a4f87f.js" defer></script>
+  </body>
+</html>
