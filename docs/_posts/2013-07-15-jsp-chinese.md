@@ -20,7 +20,7 @@ tags: 乱码
 ```
 传参，使用request.getParameter()取参；
 使用request.setAttriute(name,value)传参，使用request.getAttribute(name)取参。
-出现乱码时，<!--more-->确保你已设置request.setCharacterEncoding("具体编码方式")，当然两端都得设置。
+出现乱码时，确保你已设置request.setCharacterEncoding("具体编码方式")，当然两端都得设置。
 
 # 第二
 直接在URL请求后添加，如:

@@ -6,7 +6,7 @@ comments: true
 categories: java
 tags: beans
 ---
-Spring beans 全部标签和属性<!--more-->
+Spring beans 全部标签和属性
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>

@@ -7,7 +7,7 @@ categories: java
 tags: 继承
 ---
 最近纠结一个问题：java中，使用继承时，“允许直接访问变量”和“使用继承的方法访问变量”哪种方式更好？举个例子更形象些：
-<!--more-->
+
 ``` java 第一种方式
 public class Father{
     protected String name;

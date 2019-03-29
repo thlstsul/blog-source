@@ -5,7 +5,7 @@ categories: java
 tags: JNI
 ---
 
-前段时间了解了Android NDK，也就是用c编写Android App以提高执行效率，好奇于它的实现原理，所以学习了JNI（Java Native Interface）。从Java 1.1开始，JNI标准成为java平台的一部分，它允许Java代码和其他语言写的代码进行交互。JNI一开始是为了本地已编译语言，尤其是C和C++而设计 的，但是它并不妨碍你使用其他语言，只要调用约定受支持就可以了。下面以经典的HelloWorld程序简单的讲一讲JNI：<!--more-->
+前段时间了解了Android NDK，也就是用c编写Android App以提高执行效率，好奇于它的实现原理，所以学习了JNI（Java Native Interface）。从Java 1.1开始，JNI标准成为java平台的一部分，它允许Java代码和其他语言写的代码进行交互。JNI一开始是为了本地已编译语言，尤其是C和C++而设计 的，但是它并不妨碍你使用其他语言，只要调用约定受支持就可以了。下面以经典的HelloWorld程序简单的讲一讲JNI：
 ##Hello World
 
 ``` java HelloWorld.java

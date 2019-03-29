@@ -14,7 +14,7 @@ abbacd
 OUTPUT
 c 4
 ```
-<!--more-->
+
 以下是我给出的答案：
 ``` java 
 import java.io.*;

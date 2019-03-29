@@ -6,7 +6,7 @@ comments: true
 categories: java
 tags: 合并排序
 ---
-鉴于网上的自然合并排序程序比较少，用Java实现的更少，把自己用Java实现的NatualMergeSort贴在这里避免重复造轮子。不知性能如何，有请大神帮忙分析分析。<!--more-->
+鉴于网上的自然合并排序程序比较少，用Java实现的更少，把自己用Java实现的NatualMergeSort贴在这里避免重复造轮子。不知性能如何，有请大神帮忙分析分析。
 ``` java NatualMergeSort
 public class NatualMergeSort{
 	public static void sort(Comparable[] a){

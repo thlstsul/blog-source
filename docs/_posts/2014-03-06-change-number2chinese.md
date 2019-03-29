@@ -7,7 +7,7 @@ categories: java
 tags: [笔试题, 转换]
 ---
 自己写的一个把数字金额转中文大写金额的java程序，改了两次应该没有问题
-<!--more-->
+
 ``` java
 public class Num2ZH {
     //定义单位符号数组

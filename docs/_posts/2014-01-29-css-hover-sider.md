@@ -6,7 +6,7 @@ comments: true
 categories: css
 tags: [侧边栏, 悬浮收放]
 ---
-安装了一个新的**octopress**主题后，发现新的主题没有侧边栏。<!--more-->其实这很好解决，只需要在`index`、`_include\page`、`_include\post`等你需要**sider**的地方添加：
+安装了一个新的**octopress**主题后，发现新的主题没有侧边栏。其实这很好解决，只需要在`index`、`_include\page`、`_include\post`等你需要**sider**的地方添加：
 ``` html 这里为了转义在“{}”和“%”之间添加了空格，复制代码后需除去
 { % unless page.sidebar == false % }
 <aside class="sidebar">
