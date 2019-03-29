@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "Spring beans"
 date: 2014-05-28 22:52
 comments: true

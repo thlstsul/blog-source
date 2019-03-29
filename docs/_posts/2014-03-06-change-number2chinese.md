@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "笔试题：数字金额转中文大写金额"
 date: 2014-03-06 00:21
 comments: true

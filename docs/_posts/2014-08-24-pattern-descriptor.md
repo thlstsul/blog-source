@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "装饰者模式"
 date: 2014-08-24 17:27
 comments: true

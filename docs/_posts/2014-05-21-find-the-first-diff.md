@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "笔试题：从文件中找到第一个只出现一次的字符"
 date: 2014-05-21 23:56
 comments: true

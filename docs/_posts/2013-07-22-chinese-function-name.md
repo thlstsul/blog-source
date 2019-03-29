@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "中文方法名"
 date: 2013-07-22 12:21
 comments: true

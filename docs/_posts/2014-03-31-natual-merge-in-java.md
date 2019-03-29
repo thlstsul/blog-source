@@ -1,5 +1,5 @@
 ---
-layout: post
+
 title: "Java实现自然合并排序"
 date: 2014-03-31 20:04
 comments: true
