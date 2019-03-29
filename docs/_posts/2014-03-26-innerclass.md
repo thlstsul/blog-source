@@ -2,7 +2,7 @@
 
 title: "匿名内部类解析"
 date: 2014-03-26 14:37
-comments: true
+
 categories: java
 tags: 匿名内部类
 ---

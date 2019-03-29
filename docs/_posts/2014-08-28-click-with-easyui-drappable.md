@@ -2,7 +2,7 @@
 
 title: "小知识点：easyui-draggable内部事件失效与解决、table列宽行高限制"
 date: 2014-08-28 22:52
-comments: true
+
 categories: [jquery, easyui, html]
 ---
 ### 一、easyui-draggable内部事件失效与解决

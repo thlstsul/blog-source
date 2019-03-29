@@ -2,7 +2,7 @@
 
 title: "关于继承"
 date: 2014-04-20 09:57
-comments: true
+
 categories: java
 tags: 继承
 ---

@@ -2,7 +2,7 @@
 
 title: "octopress重装后的恢复"
 date: 2014-01-30 12:52
-comments: true
+
 categories: octopress
 tags: 备份
 ---
