@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "git的push和pull"
 date: 2014-01-30 08:34
-comments: true
+
 categories: git
 tags: [push, pull]
 ---

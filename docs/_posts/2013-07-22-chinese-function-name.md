@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "中文方法名"
 date: 2013-07-22 12:21
-comments: true
+
 tags: 发现
 ---
 今天才发现，原来程序的方法名可以用中文来命名！

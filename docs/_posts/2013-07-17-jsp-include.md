@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "JSP的动态包含与静态包含的区别"
 date: 2013-07-17 16:42
-comments: true
+
 categories: jsp
 tags: 静动包含
 ---

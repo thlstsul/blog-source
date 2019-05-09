@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "传递中文参数时出现乱码"
 date: 2013-07-15 20:11
-comments: true
+
 categories: jsp
 tags: 乱码
 ---

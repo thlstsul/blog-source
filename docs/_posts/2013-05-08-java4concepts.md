@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "浅谈Java中的四个核心概念"
 date: 2013-05-08 23:04
-comments: true
+
 categories: java
 tags: java核心
 ---

@@ -1,8 +1,8 @@
 ---
-layout: post
+
 title: "最近做的一个安卓小程序"
 date: 2014-03-20 22:53
-comments: true
+
 categories: Android
 tags: SensorEventListener
 ---
